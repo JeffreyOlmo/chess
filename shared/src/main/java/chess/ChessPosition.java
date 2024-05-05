@@ -42,7 +42,7 @@ public class ChessPosition {
      * Assumes a standard 8x8 chess board and 1-based indexing for row and column
      * @return true if the position is valid, false otherwise
      */
-    public boolean isValid() {
+    public boolean inBoard() {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 

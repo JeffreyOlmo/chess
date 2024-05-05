@@ -27,38 +27,35 @@ public class ChessPiece {
         PAWN
     }
 
+
+
     /**
      * @return Which team this chess piece belongs to
      */
-    public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+    public ChessGame.TeamColor getTeamColor(){
+        return this.pieceColor;
     }
-        return this.pieceColor
-    /**
-     * @return which type of chess piece this piece is
-     */
-    public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
-    }
+
+    public PieceType getPieceType(){
         return this.type;
-    /**
-     * Calculates all the positions a chess piece can move to
-     * Does not take into account moves that are illegal due to leaving the king in
-     * danger
-     *
-     * @return Collection of valid moves
-     */
-// ...
+    }
 
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
-        switch (type) {
+        switch (this.type) {
             case KING:
                 for (int dx = -1; dx <= 1; dx++) {
                     for (int dy = -1; dy <= 1; dy++) {
                         ChessPosition newPosition = myPosition.adjust(dx, dy);
-                        if (newPosition.isValid()) {
-                            validMoves.add(new ChessMove(myPosition, newPosition));
+                        if(newPosition.inBoard()) {
+                            ChessPiece otherPiece = board.getPiece(newPosition);
+                            if (otherPiece != null) {
+                                if (otherPiece.getTeamColor() != this.pieceColor) {
+                                    validMoves.add(new ChessMove(myPosition, newPosition));
+                                }
+                            } else {
+                                validMoves.add(new ChessMove(myPosition, newPosition));
+                            }
                         }
                     }
                 }
@@ -68,7 +65,14 @@ public class ChessPiece {
                     for (int dy = -1; dy <= 1; dy++) {
                         if (dx != 0 || dy != 0) {
                             ChessPosition newPosition = myPosition.adjust(dx, dy);
-                            while (newPosition.isValid()) {
+                            while (newPosition.inBoard()) {
+                                ChessPiece otherPiece = board.getPiece(newPosition);
+                                if (otherPiece != null) {
+                                    if (otherPiece.getTeamColor() != this.pieceColor) {
+                                        validMoves.add(new ChessMove(myPosition, newPosition));
+                                    }
+                                    break;
+                                }
                                 validMoves.add(new ChessMove(myPosition, newPosition));
                                 newPosition = newPosition.adjust(dx, dy);
                             }
@@ -77,10 +81,17 @@ public class ChessPiece {
                 }
                 break;
             case BISHOP:
-                for (int dx = -1; dx <= 1; dx+=2) {
-                    for (int dy = -1; dy <= 1; dy+=2) {
+                for (int dx = -1; dx <= 1; dx += 2) {
+                    for (int dy = -1; dy <= 1; dy += 2) {
                         ChessPosition newPosition = myPosition.adjust(dx, dy);
-                        while (newPosition.isValid()) {
+                        while (newPosition.inBoard()) {
+                            ChessPiece otherPiece = board.getPiece(newPosition);
+                            if (otherPiece != null) {
+                                if (otherPiece.getTeamColor() != this.pieceColor) {
+                                    validMoves.add(new ChessMove(myPosition, newPosition));
+                                }
+                                break;
+                            }
                             validMoves.add(new ChessMove(myPosition, newPosition));
                             newPosition = newPosition.adjust(dx, dy);
                         }
@@ -90,10 +101,17 @@ public class ChessPiece {
             case KNIGHT:
                 for (int dx = -2; dx <= 2; dx++) {
                     for (int dy = -2; dy <= 2; dy++) {
-                        if (Math.abs(dx * dy) == 2) {
+                        if (Math.abs(dx) != Math.abs(dy) && Math.abs(dx) + Math.abs(dy) == 3) {
                             ChessPosition newPosition = myPosition.adjust(dx, dy);
-                            if (newPosition.isValid()) {
-                                validMoves.add(new ChessMove(myPosition, newPosition));
+                            if (newPosition.inBoard()) {
+                                if (board.getPiece(newPosition) != null) {
+                                    if (board.getPiece(newPosition).getTeamColor() != this.pieceColor) {
+                                        validMoves.add(new ChessMove(myPosition, newPosition));
+                                    }
+                                    continue;
+                                } else {
+                                    validMoves.add(new ChessMove(myPosition, newPosition));
+                                }
                             }
                         }
                     }
@@ -104,7 +122,14 @@ public class ChessPiece {
                     for (int dy = -1; dy <= 1; dy++) {
                         if (dx == 0 || dy == 0) {
                             ChessPosition newPosition = myPosition.adjust(dx, dy);
-                            while (newPosition.isValid()) {
+                            while (newPosition.inBoard()) {
+                                ChessPiece otherPiece = board.getPiece(newPosition);
+                                if(otherPiece != null) {
+                                    if(otherPiece.getTeamColor() != this.pieceColor) {
+                                        validMoves.add(new ChessMove(myPosition, newPosition));
+                                    }
+                                    break;
+                                }
                                 validMoves.add(new ChessMove(myPosition, newPosition));
                                 newPosition = newPosition.adjust(dx, dy);
                             }
@@ -113,12 +138,32 @@ public class ChessPiece {
                 }
                 break;
             case PAWN:
-                ChessPosition newPosition = pieceColor == TeamColor.WHITE ? myPosition.adjust(0, 1) : myPosition.adjust(0, -1);
-                if (newPosition.isValid()) {
+                ChessPosition newPosition = this.pieceColor == TeamColor.WHITE ? myPosition.adjust(0, 1) : myPosition.adjust(0, -1);
+                if (newPosition.inBoard() && board.getPiece(newPosition) == null) {
                     validMoves.add(new ChessMove(myPosition, newPosition));
+
+                    if (!this.hasMoved) {
+                        ChessPosition twoSquaresForward = this.pieceColor == TeamColor.WHITE ? myPosition.adjust(0, 2) : myPosition.adjust(0, -2);
+                        if (twoSquaresForward.inBoard() && board.getPiece(twoSquaresForward) == null) {
+                            validMoves.add(new ChessMove(myPosition, twoSquaresForward));
+                        }
+                    }
+                }
+
+                ChessPosition[] takePositions = {
+                        this.pieceColor == TeamColor.WHITE ? myPosition.adjust(-1, 1) : myPosition.adjust(-1, -1),
+                        this.pieceColor == TeamColor.WHITE ? myPosition.adjust(1, 1) : myPosition.adjust(1, -1)
+                };
+
+                for (ChessPosition takePosition : takePositions) {
+                    if (takePosition.inBoard()) {
+                        ChessPiece potentialTarget = board.getPiece(takePosition);
+                        if (potentialTarget != null && potentialTarget.getTeamColor() != this.pieceColor) {
+                            validMoves.add(new ChessMove(myPosition, takePosition));
+                        }
+                    }
                 }
                 break;
-        }
         return validMoves;
     }
 
@@ -131,13 +176,13 @@ public class ChessPiece {
         ChessPiece that = (ChessPiece) o;
 
         if (pieceColor != that.pieceColor) return false;
-        return type == that.type;
+        return this.type == that.type;
     }
 
     @Override
     public int hashCode() {
         int result = pieceColor != null ? pieceColor.hashCode() : 0;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (this.type != null ? type.hashCode() : 0);
         return result;
     }
 
