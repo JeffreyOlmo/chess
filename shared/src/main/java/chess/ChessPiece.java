@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -9,10 +11,14 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
+    private ChessGame.TeamColor pieceColor;
+    private ChessPiece.PieceType type;
+    private boolean hasMoved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.hasMoved = false;
     }
 
     /**
@@ -26,7 +32,6 @@ public class ChessPiece {
         ROOK,
         PAWN
     }
-
 
 
     /**
@@ -47,14 +52,14 @@ public class ChessPiece {
                 for (int dx = -1; dx <= 1; dx++) {
                     for (int dy = -1; dy <= 1; dy++) {
                         ChessPosition newPosition = myPosition.adjust(dx, dy);
-                        if(newPosition.inBoard()) {
+                        if (newPosition.inBoard()) {
                             ChessPiece otherPiece = board.getPiece(newPosition);
                             if (otherPiece != null) {
                                 if (otherPiece.getTeamColor() != this.pieceColor) {
-                                    validMoves.add(new ChessMove(myPosition, newPosition));
+                                    validMoves.add(new ChessMove(myPosition, newPosition, null));
                                 }
                             } else {
-                                validMoves.add(new ChessMove(myPosition, newPosition));
+                                validMoves.add(new ChessMove(myPosition, newPosition, null));
                             }
                         }
                     }
@@ -69,11 +74,11 @@ public class ChessPiece {
                                 ChessPiece otherPiece = board.getPiece(newPosition);
                                 if (otherPiece != null) {
                                     if (otherPiece.getTeamColor() != this.pieceColor) {
-                                        validMoves.add(new ChessMove(myPosition, newPosition));
+                                        validMoves.add(new ChessMove(myPosition, newPosition, null));
                                     }
                                     break;
                                 }
-                                validMoves.add(new ChessMove(myPosition, newPosition));
+                                validMoves.add(new ChessMove(myPosition, newPosition, null));
                                 newPosition = newPosition.adjust(dx, dy);
                             }
                         }
@@ -88,11 +93,11 @@ public class ChessPiece {
                             ChessPiece otherPiece = board.getPiece(newPosition);
                             if (otherPiece != null) {
                                 if (otherPiece.getTeamColor() != this.pieceColor) {
-                                    validMoves.add(new ChessMove(myPosition, newPosition));
+                                    validMoves.add(new ChessMove(myPosition, newPosition, null));
                                 }
                                 break;
                             }
-                            validMoves.add(new ChessMove(myPosition, newPosition));
+                            validMoves.add(new ChessMove(myPosition, newPosition, null));
                             newPosition = newPosition.adjust(dx, dy);
                         }
                     }
@@ -106,11 +111,11 @@ public class ChessPiece {
                             if (newPosition.inBoard()) {
                                 if (board.getPiece(newPosition) != null) {
                                     if (board.getPiece(newPosition).getTeamColor() != this.pieceColor) {
-                                        validMoves.add(new ChessMove(myPosition, newPosition));
+                                        validMoves.add(new ChessMove(myPosition, newPosition, null));
                                     }
                                     continue;
                                 } else {
-                                    validMoves.add(new ChessMove(myPosition, newPosition));
+                                    validMoves.add(new ChessMove(myPosition, newPosition, null));
                                 }
                             }
                         }
@@ -124,13 +129,13 @@ public class ChessPiece {
                             ChessPosition newPosition = myPosition.adjust(dx, dy);
                             while (newPosition.inBoard()) {
                                 ChessPiece otherPiece = board.getPiece(newPosition);
-                                if(otherPiece != null) {
-                                    if(otherPiece.getTeamColor() != this.pieceColor) {
-                                        validMoves.add(new ChessMove(myPosition, newPosition));
+                                if (otherPiece != null) {
+                                    if (otherPiece.getTeamColor() != this.pieceColor) {
+                                        validMoves.add(new ChessMove(myPosition, newPosition, null));
                                     }
                                     break;
                                 }
-                                validMoves.add(new ChessMove(myPosition, newPosition));
+                                validMoves.add(new ChessMove(myPosition, newPosition, null));
                                 newPosition = newPosition.adjust(dx, dy);
                             }
                         }
@@ -138,52 +143,33 @@ public class ChessPiece {
                 }
                 break;
             case PAWN:
-                ChessPosition newPosition = this.pieceColor == TeamColor.WHITE ? myPosition.adjust(0, 1) : myPosition.adjust(0, -1);
+                ChessPosition newPosition = this.pieceColor == ChessGame.TeamColor.WHITE ? myPosition.adjust(0, 1) : myPosition.adjust(0, -1);
                 if (newPosition.inBoard() && board.getPiece(newPosition) == null) {
-                    validMoves.add(new ChessMove(myPosition, newPosition));
+                    validMoves.add(new ChessMove(myPosition, newPosition, null));
 
                     if (!this.hasMoved) {
-                        ChessPosition twoSquaresForward = this.pieceColor == TeamColor.WHITE ? myPosition.adjust(0, 2) : myPosition.adjust(0, -2);
+                        ChessPosition twoSquaresForward = this.pieceColor == ChessGame.TeamColor.WHITE ? myPosition.adjust(0, 2) : myPosition.adjust(0, -2);
                         if (twoSquaresForward.inBoard() && board.getPiece(twoSquaresForward) == null) {
-                            validMoves.add(new ChessMove(myPosition, twoSquaresForward));
+                            validMoves.add(new ChessMove(myPosition, twoSquaresForward, null));
                         }
                     }
                 }
 
                 ChessPosition[] takePositions = {
-                        this.pieceColor == TeamColor.WHITE ? myPosition.adjust(-1, 1) : myPosition.adjust(-1, -1),
-                        this.pieceColor == TeamColor.WHITE ? myPosition.adjust(1, 1) : myPosition.adjust(1, -1)
+                        this.pieceColor == ChessGame.TeamColor.WHITE ? myPosition.adjust(-1, 1) : myPosition.adjust(-1, -1),
+                        this.pieceColor == ChessGame.TeamColor.WHITE ? myPosition.adjust(1, 1) : myPosition.adjust(1, -1)
                 };
 
                 for (ChessPosition takePosition : takePositions) {
                     if (takePosition.inBoard()) {
                         ChessPiece potentialTarget = board.getPiece(takePosition);
                         if (potentialTarget != null && potentialTarget.getTeamColor() != this.pieceColor) {
-                            validMoves.add(new ChessMove(myPosition, takePosition));
+                            validMoves.add(new ChessMove(myPosition, takePosition, null));
                         }
                     }
                 }
                 break;
+        }
         return validMoves;
     }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ChessPiece that = (ChessPiece) o;
-
-        if (pieceColor != that.pieceColor) return false;
-        return this.type == that.type;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = pieceColor != null ? pieceColor.hashCode() : 0;
-        result = 31 * result + (this.type != null ? type.hashCode() : 0);
-        return result;
-    }
-
 }
