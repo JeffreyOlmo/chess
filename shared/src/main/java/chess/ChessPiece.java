@@ -145,6 +145,8 @@ public class ChessPiece {
                 break;
             case PAWN:
                 ChessPosition newPosition = this.pieceColor == ChessGame.TeamColor.WHITE ? myPosition.adjust(1, 0) : myPosition.adjust(-1, 0);
+                System.out.println("New position under consideration: " + newPosition.getRow() + "," + newPosition.getColumn());
+                System.out.println("Is the new position inside the board and unoccupied? " + (newPosition.inBoard() && board.getPiece(newPosition) == null));
 
                 if (newPosition.inBoard() && board.getPiece(newPosition) == null) {
                     if (this.pieceColor == ChessGame.TeamColor.WHITE && newPosition.getRow() == 8
@@ -152,20 +154,25 @@ public class ChessPiece {
                         for (ChessPiece.PieceType promotionPiece : ChessPiece.PieceType.values()) {
                             if (promotionPiece != PieceType.KING && promotionPiece != PieceType.PAWN){
                                 validMoves.add(new ChessMove(myPosition, newPosition, promotionPiece));
+                                System.out.println("Added promotion move: " + newPosition.getRow() + "," + newPosition.getColumn() + ", promoted to: " + promotionPiece.name());
                             }
                         }
 
                     } else {
                         validMoves.add(new ChessMove(myPosition, newPosition, null));
+                        System.out.println("Added: " + newPosition.getRow() + "," + newPosition.getColumn());
                     }
 
                     boolean isOriginalRow = (pieceColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2)
                             || (pieceColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7);
+                    System.out.println("Is this the first move? " + isOriginalRow);
 
                     if (isOriginalRow) {
                         ChessPosition twoSquaresForward = this.pieceColor == ChessGame.TeamColor.WHITE ? myPosition.adjust(2, 0) : myPosition.adjust(-2, 0);
+                        System.out.println("Is the en passant position inside the board and unoccupied? " + (twoSquaresForward.inBoard() && board.getPiece(twoSquaresForward) == null));
                         if (twoSquaresForward.inBoard() && board.getPiece(twoSquaresForward) == null) {
                             validMoves.add(new ChessMove(myPosition, twoSquaresForward, null));
+                            System.out.println("Added: " + twoSquaresForward.getRow() + "," + twoSquaresForward.getColumn());
                         }
                     }
                 }
@@ -185,11 +192,13 @@ public class ChessPiece {
                                 for (ChessPiece.PieceType promotionPiece : ChessPiece.PieceType.values()) {
                                     if (promotionPiece != PieceType.KING && promotionPiece != PieceType.PAWN){
                                         validMoves.add(new ChessMove(myPosition, takePosition, promotionPiece));
+                                        System.out.println("Added capture promotion move: " + newPosition.getRow() + "," + newPosition.getColumn() + ", promoted to: " + promotionPiece.name());
                                     }
 
                                 }
                             } else {
                                 validMoves.add(new ChessMove(myPosition, takePosition, null));
+                                System.out.println("Added: " + takePosition.getRow() + "," + takePosition.getColumn());
                             }
                         }
                     }
