@@ -2,6 +2,7 @@ package chess;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ChessBoard {
 
@@ -9,7 +10,7 @@ public class ChessBoard {
 
     public ChessBoard() {
         this.board = new HashMap<>();
-        resetBoard();
+        //resetBoard();
     }
 
     public void addPiece(ChessPosition position, ChessPiece piece) {
@@ -54,5 +55,18 @@ public class ChessBoard {
         addPiece(new ChessPosition(8, 6), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
         addPiece(new ChessPosition(8, 7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
         addPiece(new ChessPosition(8, 8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Objects.equals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(board);
     }
 }

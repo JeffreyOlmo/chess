@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: passoff.chess.ChessBoardTests
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.001 s <<< FAILURE! -- in passoff.chess.ChessBoardTests
-passoff.chess.ChessBoardTests.defaultGameBoard -- Time elapsed: 0 s <<< FAILURE!
+Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.003 s <<< FAILURE! -- in passoff.chess.ChessBoardTests
+passoff.chess.ChessBoardTests.defaultGameBoard -- Time elapsed: 0.001 s <<< FAILURE!
 org.opentest4j.AssertionFailedError: expected: <chess.ChessBoard@748741cb> but was: <chess.ChessBoard@3e44f2a5>
 	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
 	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)

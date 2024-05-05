@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: passoff.chess.piece.KnightMoveTests
 -------------------------------------------------------------------------------
-Tests run: 12, Failures: 0, Errors: 12, Skipped: 0, Time elapsed: 0.013 s <<< FAILURE! -- in passoff.chess.piece.KnightMoveTests
-passoff.chess.piece.KnightMoveTests.knightCaptureEnemy -- Time elapsed: 0.001 s <<< ERROR!
+Tests run: 12, Failures: 0, Errors: 12, Skipped: 0, Time elapsed: 0.012 s <<< FAILURE! -- in passoff.chess.piece.KnightMoveTests
+passoff.chess.piece.KnightMoveTests.knightCaptureEnemy -- Time elapsed: 0 s <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess.ChessBoard, chess.ChessPosition)" because "testPiece" is null
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:20)
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:16)
@@ -152,7 +152,7 @@ java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess
 	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
 
-passoff.chess.piece.KnightMoveTests.knightCornerOfBoardBottomRight -- Time elapsed: 0 s <<< ERROR!
+passoff.chess.piece.KnightMoveTests.knightCornerOfBoardBottomRight -- Time elapsed: 0.001 s <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess.ChessBoard, chess.ChessPosition)" because "testPiece" is null
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:20)
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:16)
@@ -302,7 +302,7 @@ java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess
 	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
 
-passoff.chess.piece.KnightMoveTests.knightBlocked -- Time elapsed: 0.001 s <<< ERROR!
+passoff.chess.piece.KnightMoveTests.knightBlocked -- Time elapsed: 0 s <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess.ChessBoard, chess.ChessPosition)" because "testPiece" is null
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:20)
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:16)
@@ -377,7 +377,7 @@ java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess
 	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
 
-passoff.chess.piece.KnightMoveTests.knightEdgeOfBoardLeft -- Time elapsed: 0 s <<< ERROR!
+passoff.chess.piece.KnightMoveTests.knightEdgeOfBoardLeft -- Time elapsed: 0.001 s <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess.ChessBoard, chess.ChessPosition)" because "testPiece" is null
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:20)
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:16)
@@ -602,7 +602,7 @@ java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess
 	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
 
-passoff.chess.piece.KnightMoveTests.knightEdgeOfBoardRight -- Time elapsed: 0 s <<< ERROR!
+passoff.chess.piece.KnightMoveTests.knightEdgeOfBoardRight -- Time elapsed: 0.001 s <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess.ChessBoard, chess.ChessPosition)" because "testPiece" is null
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:20)
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:16)
@@ -827,7 +827,7 @@ java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess
 	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
 
-passoff.chess.piece.KnightMoveTests.knightEdgeOfBoardBottom -- Time elapsed: 0 s <<< ERROR!
+passoff.chess.piece.KnightMoveTests.knightEdgeOfBoardBottom -- Time elapsed: 0.001 s <<< ERROR!
 java.lang.NullPointerException: Cannot invoke "chess.ChessPiece.pieceMoves(chess.ChessBoard, chess.ChessPosition)" because "testPiece" is null
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:20)
 	at passoff.chess.TestUtilities.validateMoves(TestUtilities.java:16)
