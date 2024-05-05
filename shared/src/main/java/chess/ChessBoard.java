@@ -55,4 +55,18 @@ public class ChessBoard {
         addPiece(new ChessPosition(8, 7), new ChessPiece(ChessPiece.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
         addPiece(new ChessPosition(8, 8), new ChessPiece(ChessPiece.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return board.equals(that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board);
+    }
 }
