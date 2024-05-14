@@ -59,26 +59,32 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (board.getPiece(move.getStartPosition()) == null) {
+            throw new InvalidMoveException("No piece at given position " +
+                    move.getStartPosition());
+        }
+
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (!piece.pieceMoves(board, move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException("Invalid move attempted from " +
-                    move.getStartPosition() + " to " + move.getEndPosition()); // make sure to instantiate this correctly
+                    move.getStartPosition() + " to " + move.getEndPosition());
         }
 
-        // movement logic
+        if (board.getPiece(move.getEndPosition()) != null &&
+                board.getPiece(move.getEndPosition()).getTeamColor() == piece.getTeamColor()) {
+            throw new InvalidMoveException("Cannot capture own piece at " +
+                    move.getEndPosition());
+        }
+
         if (move.getPromotionPiece() == null) {
-            // Remove the piece from its initial position:
             board.removePiece(move.getStartPosition());
 
-            // If there is a piece at the destination location, remove it too (capturing):
             if (board.getPiece(move.getEndPosition()) != null) {
                 board.removePiece(move.getEndPosition());
             }
 
-            // Place the piece at the new location:
             board.addPiece(move.getEndPosition(), piece);
         } else {
-            // this is for pawn promotion case
             board.removePiece(move.getStartPosition());
             if (board.getPiece(move.getEndPosition()) != null) {
                 board.removePiece(move.getEndPosition());
