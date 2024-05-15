@@ -84,8 +84,8 @@ public class ChessGame {
 
     public ChessBoard copyChessBoard(ChessBoard original) {
         ChessBoard copy = new ChessBoard();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 ChessPosition position = new ChessPosition(i,j);
                 if (original.getPiece(position) != null) {
                     ChessPiece copyPiece = new ChessPiece(original.getPiece(position).getTeamColor(),
@@ -132,7 +132,7 @@ public class ChessGame {
                     move.getStartPosition() + " to " + move.getEndPosition());
         }
 
-        if (board.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.KING ||
+        if (board.getPiece(move.getStartPosition()).getPieceType() == ChessPiece.PieceType.KING &&
                 kingInCheck(move.getEndPosition(), this.board)) {
             throw new InvalidMoveException("King can't move into check from " +
                     move.getStartPosition() + " to " + move.getEndPosition());
@@ -140,7 +140,6 @@ public class ChessGame {
 
         ChessPosition kingPos = getKingPosition(getTeamTurn());
         if (kingInCheck(kingPos, this.board)) {
-            System.out.println("This team's king is in check at the start");
             ChessBoard hypotheticalBoard = copyChessBoard(this.board);
             //make the hypothetical move
             hypotheticalBoard.removePiece(move.getStartPosition());
@@ -151,7 +150,6 @@ public class ChessGame {
             hypotheticalBoard.addPiece(move.getEndPosition(), promotedPiece);
 
             if (kingInCheck(kingPos, hypotheticalBoard)){
-                System.out.println("This team's king is still in check after the move");
                 throw new InvalidMoveException("King is still in check after move from " +
                         move.getStartPosition() + " to " + move.getEndPosition());
             }
@@ -162,7 +160,7 @@ public class ChessGame {
             throw new InvalidMoveException("Cannot capture own piece at " +
                     move.getEndPosition());
         }
-
+        printBoard(board);
         if (move.getPromotionPiece() == null) {
             board.removePiece(move.getStartPosition());
 
@@ -171,6 +169,8 @@ public class ChessGame {
             }
 
             board.addPiece(move.getEndPosition(), piece);
+            printBoard(board);
+
         } else {
             board.removePiece(move.getStartPosition());
             if (board.getPiece(move.getEndPosition()) != null) {
@@ -179,6 +179,18 @@ public class ChessGame {
             ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
             board.addPiece(move.getEndPosition(), promotedPiece);
         }
+    }
+
+    public void printBoard(ChessBoard board) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition currentPos = new ChessPosition(row, col);
+                if (board.getPiece(currentPos) != null) {
+                    System.out.println(board.getPiece(currentPos).getPieceType() + " at " + currentPos.getColumn() + "," + currentPos.getRow());
+                }
+            }
+        }
+        System.out.println("_________");
     }
 
 
@@ -198,7 +210,9 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-//    public boolean isInCheckmate(TeamColor teamColor) {
+    public boolean isInCheckmate(TeamColor teamColor) {
+        throw new RuntimeException("Not implemented");
+    }
 //        if (!kingInCheck(getKingPosition(teamColor), this.board)){
 //            return false;
 //        }
