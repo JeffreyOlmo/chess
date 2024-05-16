@@ -131,6 +131,10 @@ public class ChessGame {
                     move.getStartPosition());
         }
 
+        if (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("Can't move out of turn!");
+        }
+
         ChessPiece piece = board.getPiece(move.getStartPosition());
         System.out.println("This move is " + piece.getPieceType() +
                 " moving to " + move.getEndPosition().getRow() + " , " + move.getEndPosition().getColumn());
@@ -228,6 +232,7 @@ public class ChessGame {
             ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
             board.addPiece(move.getEndPosition(), promotedPiece);
         }
+        this.teamTurn = this.teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     public void printBoard(ChessBoard board) {
@@ -275,6 +280,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if (this.teamTurn != teamColor ){
+            return false;
+        }
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition currentPosition = new ChessPosition(row, col);
