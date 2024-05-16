@@ -57,7 +57,9 @@ public class ChessGame {
         if (startPosition == null) {
             return null;
         }
+        TeamColor origionalTurn = this.teamTurn;
         ChessPiece currentPiece = board.getPiece(startPosition);
+        this.teamTurn = currentPiece.getTeamColor();
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessBoard hypotheticalBoard = copyChessBoard(board);
         for (ChessMove move : currentPiece.pieceMoves(hypotheticalBoard, startPosition)) {
@@ -65,9 +67,13 @@ public class ChessGame {
                 checkMove(move);
                 validMoves.add(move);
             } catch (InvalidMoveException e) {
-
+                System.out.println(e);
             }
         }
+
+        //Castling
+
+        this.teamTurn = origionalTurn;
         return validMoves;
     }
 
