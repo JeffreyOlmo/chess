@@ -27,9 +27,9 @@ public class AuthService {
      */
     public AuthData createSession(UserData user) throws CodedException {
         try {
-            UserData loggedInUser = dataAccess.readUser(user.username());
-            if (loggedInUser != null && loggedInUser.password().equals(user.password())) {
-                return dataAccess.writeAuth(loggedInUser.username());
+            UserData loggedInUser = dataAccess.readUser(user.getUsername());
+            if (loggedInUser != null && loggedInUser.getPassword().equals(user.getPassword())) {
+                return dataAccess.writeAuth(loggedInUser.getUsername());
             }
             throw new CodedException(401, "Invalid username or password");
         } catch (DataAccessException ex) {

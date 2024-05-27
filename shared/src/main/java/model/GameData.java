@@ -3,11 +3,14 @@ package model;
 import chess.ChessGame;
 import com.google.gson.Gson;
 
-/**
- * Represents the serialization of a game. This includes who the players are, and the game itself.
- */
-public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game,
-                       State state) {
+public class GameData {
+    private int gameID;
+    private String whiteUsername;
+    private String blackUsername;
+    private String gameName;
+    private ChessGame game;
+    private State state;
+
     public enum State {
         WHITE,
         BLACK,
@@ -15,6 +18,42 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         UNDECIDED
     }
 
+    // Constructor
+    public GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game, State state) {
+        this.gameID = gameID;
+        this.whiteUsername = whiteUsername;
+        this.blackUsername = blackUsername;
+        this.gameName = gameName;
+        this.game = game;
+        this.state = state;
+    }
+
+    // Getters
+    public int getGameID() {
+        return gameID;
+    }
+
+    public String getWhiteUsername() {
+        return whiteUsername;
+    }
+
+    public String getBlackUsername() {
+        return blackUsername;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    public ChessGame getGame() {
+        return game;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    // Methods from original record
     public boolean isGameOver() {
         return state != State.UNDECIDED;
     }
@@ -27,8 +66,8 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         return new GameData(this.gameID, this.whiteUsername, userName, this.gameName, this.game, this.state);
     }
 
-    public GameData clearBoard() {
-        return new GameData(this.gameID, this.whiteUsername, this.blackUsername, this.gameName, null, this.state);
+    public void clearBoard() {
+        this.game = null;
     }
 
     public GameData setState(State state) {

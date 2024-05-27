@@ -52,13 +52,13 @@ public class GameService {
 
     private void assignColorToPlayer(String username, ChessGame.TeamColor color, GameData loadedGame) throws CodedException {
         if (color == ChessGame.TeamColor.WHITE) {
-            if (loadedGame.whiteUsername() == null || loadedGame.whiteUsername().equals(username)) {
+            if (loadedGame.getWhiteUsername() == null || loadedGame.getWhiteUsername().equals(username)) {
                 loadedGame = loadedGame.setWhite(username);
             } else {
                 throw new CodedException(403, "Color taken");
             }
         } else if (color == ChessGame.TeamColor.BLACK) {
-            if (loadedGame.blackUsername() == null || loadedGame.blackUsername().equals(username)) {
+            if (loadedGame.getBlackUsername() == null || loadedGame.getBlackUsername().equals(username)) {
                 loadedGame = loadedGame.setBlack(username);
             } else {
                 throw new CodedException(403, "Color taken");

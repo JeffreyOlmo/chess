@@ -1,4 +1,4 @@
-package java.service;
+package myJava.service;
 
 import dataaccess.MemoryDataAccess;
 import model.UserData;

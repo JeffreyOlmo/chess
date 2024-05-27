@@ -1,4 +1,4 @@
-package java.service;
+package myJava.service;
 
 import dataaccess.MemoryDataAccess;
 import model.UserData;
@@ -27,7 +27,7 @@ public class AdminServiceTests {
 
         var authService = new AuthService(memoryDataAccess);
         Assertions.assertThrows(CodedException.class, () -> authService.createSession(user));
-        Assertions.assertNull(authService.getAuthData(authData.authToken()));
+        Assertions.assertNull(authService.getAuthData(authData.getAuthToken()));
 
         var games = gameService.listGames();
         Assertions.assertEquals(0, games.size());

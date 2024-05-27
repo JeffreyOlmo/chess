@@ -30,8 +30,8 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     public UserData writeUser(UserData user) throws DataAccessException {
-        if (users.get(user.username()) == null) {
-            users.put(user.username(), user);
+        if (users.get(user.getUsername()) == null) {
+            users.put(user.getUsername(), user);
             return user;
         }
 
@@ -44,7 +44,7 @@ public class MemoryDataAccess implements DataAccess {
 
     public AuthData writeAuth(String username) {
         var auth = new AuthData(AuthData.generateToken(), username);
-        auths.put(auth.authToken(), auth);
+        auths.put(auth.getAuthToken(), auth);
         return auth;
     }
 
@@ -59,14 +59,14 @@ public class MemoryDataAccess implements DataAccess {
     public GameData newGame(String gameName) {
         var gameID = nextID++;
         var gameData = new GameData(gameID, null, null, gameName, new ChessGame(), GameData.State.UNDECIDED);
-        games.put(gameData.gameID(), gameData);
-        gameData.game().getBoard().resetBoard();
-        gameData.game().setTeamTurn(ChessGame.TeamColor.WHITE);
+        games.put(gameData.getGameID(), gameData);
+        gameData.getGame().getBoard().resetBoard();
+        gameData.getGame().setTeamTurn(ChessGame.TeamColor.WHITE);
         return gameData;
     }
 
     public void updateGame(GameData game) {
-        games.put(game.gameID(), game);
+        games.put(game.getGameID(), game);
     }
 
     public GameData readGame(int gameID) {

@@ -97,7 +97,7 @@ public class Server {
     private Object registerUser(Request req, Response ignore) throws CodedException {
         var user = getBody(req, UserData.class);
         var authToken = userService.registerUser(user);
-        return send("username", user.username(), "authToken", authToken.authToken());
+        return send("username", user.getUsername(), "authToken", authToken.getAuthToken());
     }
 
     /**
@@ -107,7 +107,7 @@ public class Server {
     public Object createSession(Request req, Response ignore) throws CodedException {
         var user = getBody(req, UserData.class);
         var authData = authService.createSession(user);
-        return send("username", user.username(), "authToken", authData.authToken());
+        return send("username", user.getUsername(), "authToken", authData.getAuthToken());
     }
     /**
      * Endpoint for [DELETE] /session
@@ -115,7 +115,7 @@ public class Server {
      */
     public Object deleteSession(Request req, Response ignore) throws CodedException {
         var authData = throwIfUnauthorized(req);
-        authService.deleteSession(authData.authToken());
+        authService.deleteSession(authData.getAuthToken());
         return send();
     }
 
@@ -135,8 +135,8 @@ public class Server {
     public Object createGame(Request req, Response ignoreRes) throws CodedException {
         throwIfUnauthorized(req);
         var gameData = getBody(req, GameData.class);
-        gameData = gameService.createGame(gameData.gameName());
-        return send("gameID", gameData.gameID());
+        gameData = gameService.createGame(gameData.getGameName());
+        return send("gameID", gameData.getGameID());
     }
     /**
      * Endpoint for [PUT] /
@@ -146,9 +146,10 @@ public class Server {
     public Object joinGame(Request req, Response ignoreRes) throws CodedException {
         var authData = throwIfUnauthorized(req);
         var joinReq = getBody(req, JoinRequest.class);
-        gameService.joinGame(authData.username(), joinReq.playerColor(), joinReq.gameID());
+        gameService.joinGame(authData.getUsername(), joinReq.getPlayerColor(), joinReq.getGameID());
         return send();
     }
+
     private <T> T getBody(Request request, Class<T> clazz) throws CodedException {
         var body = new Gson().fromJson(request.body(), clazz);
         if (body == null) {

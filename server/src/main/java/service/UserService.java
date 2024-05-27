@@ -26,12 +26,12 @@ public class UserService {
      * @throws CodedException if a user with the same username already exists
      */
     public AuthData registerUser(UserData user) throws CodedException {
-        if (StringUtils.isEmpty(user.username())) throw new CodedException(400, "missing username");
-        if (StringUtils.isEmpty(user.password())) throw new CodedException(400, "missing password");
+        if (StringUtils.isEmpty(user.getUsername())) throw new CodedException(400, "missing username");
+        if (StringUtils.isEmpty(user.getPassword())) throw new CodedException(400, "missing password");
 
         try {
             user = dataAccess.writeUser(user);
-            return dataAccess.writeAuth(user.username());
+            return dataAccess.writeAuth(user.getUsername());
         } catch (DataAccessException ex) {
             throw new CodedException(403, "Unable to register user");
         }
