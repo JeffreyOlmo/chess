@@ -1,7 +1,0 @@
-grant {
-    permission java.security.AllPermission;
-    permission java.util.PropertyPermission "idea.is.junit5", "read";
-    permission java.util.PropertyPermission "idea.test.cyclic.buffer.size", "read";
-    permission java.util.PropertyPermission "junit.jupiter.extensions.autodetection.enabled", "read";
-    permission java.lang.RuntimePermission "accessClassInPackage.com.intellij.rt.junit", "read";
-};
