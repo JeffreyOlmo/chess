@@ -1,6 +1,5 @@
 package myJava.service;
 
-import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
@@ -14,7 +13,7 @@ import util.CodedException;
 
 import java.util.ArrayList;
 
-public class AdminServiceTests {
+public class adminServiceTests {
 
     private MemoryDataAccess dataAccess;
     private AdminService service;

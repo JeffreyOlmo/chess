@@ -9,7 +9,7 @@ import service.AuthService;
 import service.UserService;
 import util.CodedException;
 
-public class AuthServiceTests {
+public class authServiceTests {
 
     @Test
     public void createSessionPositive() throws CodedException {

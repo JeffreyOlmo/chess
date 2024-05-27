@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import util.CodedException;
 import service.UserService;
 
-public class UserServiceTests {
+public class userServiceTests {
 
     @Test
     public void registerUser() {

@@ -1,6 +1,5 @@
 package myJava.service;
 
-import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.GameData;
 import org.junit.jupiter.api.Assertions;
@@ -8,9 +7,8 @@ import org.junit.jupiter.api.Test;
 import service.GameService;
 import util.CodedException;
 import chess.ChessGame;
-import java.util.Collection;
 
-public class GameServiceTests {
+public class gameServiceTests {
 
     @Test
     public void createGamePositive() {

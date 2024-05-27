@@ -16,7 +16,7 @@ public class Server {
     GameService gameService;
     AdminService adminService;
     AuthService authService;
-    public static final Logger log = Logger.getLogger("chess");
+    public static final Logger LOG = Logger.getLogger("chess");
     public Server() {
     }
     public int run(int desiredPort) {
@@ -86,7 +86,7 @@ public class Server {
         return body;
     }
     private void log(Request req, Response res) {
-        log.info(String.format("[%s] %s - %s", req.requestMethod(), req.pathInfo(), res.status()));
+        LOG.info(String.format("[%s] %s - %s", req.requestMethod(), req.pathInfo(), res.status()));
     }
     /**
      * Endpoint for [DELETE] /db
