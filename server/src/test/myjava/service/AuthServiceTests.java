@@ -1,4 +1,4 @@
-package java.service;
+package myjava.service;
 
 import dataaccess.MemoryDataAccess;
 import model.AuthData;
@@ -9,7 +9,7 @@ import service.AuthService;
 import service.UserService;
 import util.CodedException;
 
-public class authServiceTests {
+public class AuthServiceTests {
 
     @Test
     public void createSessionPositive() throws CodedException {

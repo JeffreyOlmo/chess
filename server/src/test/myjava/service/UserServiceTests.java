@@ -1,4 +1,4 @@
-package java.service;
+package myjava.service;
 
 import dataaccess.MemoryDataAccess;
 import model.UserData;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import util.CodedException;
 import service.UserService;
 
-public class userServiceTests {
+public class UserServiceTests {
 
     @Test
     public void registerUser() {

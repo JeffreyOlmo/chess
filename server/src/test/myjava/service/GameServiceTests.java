@@ -1,4 +1,4 @@
-package java.service;
+package myjava.service;
 
 import dataaccess.MemoryDataAccess;
 import model.GameData;
@@ -8,7 +8,7 @@ import service.GameService;
 import util.CodedException;
 import chess.ChessGame;
 
-public class gameServiceTests {
+public class GameServiceTests {
 
     @Test
     public void createGamePositive() {

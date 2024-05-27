@@ -1,4 +1,4 @@
-package java.service;
+package myjava.service;
 
 import dataaccess.MemoryDataAccess;
 import model.UserData;
@@ -13,7 +13,7 @@ import util.CodedException;
 
 import java.util.ArrayList;
 
-public class adminServiceTests {
+public class AdminServiceTests {
 
     private MemoryDataAccess dataAccess;
     private AdminService service;
