@@ -1,4 +1,4 @@
-package myJava.service;
+package java.service;
 
 import dataaccess.MemoryDataAccess;
 import model.GameData;

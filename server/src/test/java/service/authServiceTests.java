@@ -1,4 +1,4 @@
-package myJava.service;
+package java.service;
 
 import dataaccess.MemoryDataAccess;
 import model.AuthData;
@@ -68,6 +68,11 @@ public class authServiceTests {
         var dataAccess = new MemoryDataAccess();
         var authService = new AuthService(dataAccess);
 
-        Assertions.assertThrows(CodedException.class, () -> authService.getAuthData("invalidToken"));
+        try {
+            var result = authService.getAuthData("invalidToken");
+            Assertions.assertNull(result);
+        } catch (Exception e) {
+            Assertions.fail("getAuthData threw an exception with an invalid token");
+        }
     }
 }

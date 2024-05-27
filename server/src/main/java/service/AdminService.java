@@ -5,9 +5,7 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import util.CodedException;
 
-/**
- * Provides endpoints for administrating the application.
- */
+
 public class AdminService {
 
     private final DataAccess dataAccess;

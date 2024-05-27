@@ -18,13 +18,6 @@ public class AuthService {
         this.dataAccess = dataAccess;
     }
 
-    /**
-     * Create a session for a user. If the user already has a session then
-     * the previous session is invalidated.
-     *
-     * @param user to create a session for.
-     * @return the authToken for the session.
-     */
     public AuthData createSession(UserData user) throws CodedException {
         try {
             UserData loggedInUser = dataAccess.readUser(user.getUsername());
@@ -52,11 +45,7 @@ public class AuthService {
 
     public AuthData getAuthData(String authToken) throws CodedException {
         try {
-            AuthData authData = dataAccess.readAuth(authToken);
-            if (authData == null) {
-                throw new CodedException(400, "Invalid auth token");
-            }
-            return authData;
+            return dataAccess.readAuth(authToken);
         } catch (DataAccessException ignored) {
             throw new CodedException(500, "Internal server error");
         }
