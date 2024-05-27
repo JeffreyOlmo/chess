@@ -52,7 +52,11 @@ public class AuthService {
 
     public AuthData getAuthData(String authToken) throws CodedException {
         try {
-            return dataAccess.readAuth(authToken);
+            AuthData authData = dataAccess.readAuth(authToken);
+            if (authData == null) {
+                throw new CodedException(400, "Invalid auth token");
+            }
+            return authData;
         } catch (DataAccessException ignored) {
             throw new CodedException(500, "Internal server error");
         }

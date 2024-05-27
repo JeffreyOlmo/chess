@@ -50,4 +50,24 @@ public class AuthServiceTests {
 
         Assertions.assertDoesNotThrow(() -> authService.deleteSession("invalidToken"));
     }
+
+    @Test
+    public void getAuthDataPositiveTest() throws CodedException {
+        var dataAccess = new MemoryDataAccess();
+        var userService = new UserService(dataAccess);
+        var user = new UserData("bob", "password", "bob@byu.edu");
+        userService.registerUser(user);
+
+        var authService = new AuthService(dataAccess);
+        AuthData authDataExpected = authService.createSession(user);
+        Assertions.assertDoesNotThrow(() -> authService.getAuthData(authDataExpected.getAuthToken()));
+    }
+
+    @Test
+    public void getAuthDataNegativeTest() {
+        var dataAccess = new MemoryDataAccess();
+        var authService = new AuthService(dataAccess);
+
+        Assertions.assertThrows(CodedException.class, () -> authService.getAuthData("invalidToken"));
+    }
 }

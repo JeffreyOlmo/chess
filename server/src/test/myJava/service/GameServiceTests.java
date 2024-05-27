@@ -1,5 +1,6 @@
 package myJava.service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.GameData;
 import org.junit.jupiter.api.Assertions;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import service.GameService;
 import util.CodedException;
 import chess.ChessGame;
+import java.util.Collection;
 
 public class GameServiceTests {
 
@@ -19,8 +21,7 @@ public class GameServiceTests {
 
     @Test
     public void createGameNegative() {
-        // It's unclear what a negative test for createGame might look like,
-        // as this depends on how your dataAccess.newGame method behaves with invalid input.
+        // It's unclear what a negative test for createGame might look like.
     }
 
     @Test
@@ -48,9 +49,27 @@ public class GameServiceTests {
     }
 
     @Test
-    public void listGames() {
+    public void listGamesPositive() {
         var dataAccess = new MemoryDataAccess();
         var gameService = new GameService(dataAccess);
         Assertions.assertDoesNotThrow(gameService::listGames);
     }
+
+    @Test
+    public void joinGamePositiveAssignColor() throws CodedException {
+        var dataAccess = new MemoryDataAccess();
+        var gameService = new GameService(dataAccess);
+        GameData gameData = gameService.createGame("Chess Game X1");
+        Assertions.assertDoesNotThrow(() -> gameService.joinGame("bob", ChessGame.TeamColor.WHITE, gameData.getGameID()));
+    }
+
+    @Test
+    public void joinGameNegativeAssignColor() throws CodedException {
+        var dataAccess = new MemoryDataAccess();
+        var gameService = new GameService(dataAccess);
+        GameData gameData = gameService.createGame("Chess Game X2");
+        gameService.joinGame("bob", ChessGame.TeamColor.WHITE, gameData.getGameID());
+        Assertions.assertThrows(CodedException.class, () -> gameService.joinGame("alice", ChessGame.TeamColor.WHITE, gameData.getGameID()));
+    }
+
 }
