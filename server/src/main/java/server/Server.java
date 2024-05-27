@@ -19,7 +19,7 @@ public class Server {
     public static final Logger log = Logger.getLogger("chess");
     public Server() {
     }
-    public int run(int desiredPort, String dbConnectionUrl) {
+    public int run(int desiredPort) {
         try {
             initializeServices();
             configureSpark(desiredPort);

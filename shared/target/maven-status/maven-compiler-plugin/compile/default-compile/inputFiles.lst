@@ -1,6 +1,10 @@
 /Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/chess/ChessMove.java
+/Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/model/AuthData.java
 /Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/chess/ChessGame.java
 /Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/chess/ChessBoard.java
 /Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/chess/InvalidMoveException.java
 /Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/chess/ChessPiece.java
+/Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/util/CodedException.java
 /Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/chess/ChessPosition.java
+/Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/model/UserData.java
+/Users/jeffolmo/Documents/CS240/chess/shared/src/main/java/model/GameData.java

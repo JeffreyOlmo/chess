@@ -10,7 +10,6 @@ import java.util.Collection;
 public interface DataAccess {
     void clear() throws DataAccessException;
 
-
     UserData writeUser(UserData user) throws DataAccessException;
 
     UserData readUser(String userName) throws DataAccessException;
