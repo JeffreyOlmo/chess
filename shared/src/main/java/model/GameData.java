@@ -66,10 +66,12 @@ public class GameData {
         return new GameData(this.gameID, this.whiteUsername, userName, this.gameName, this.game, this.state);
     }
 
+    @SuppressWarnings("unused")
     public void clearBoard() {
         this.game = null;
     }
 
+    @SuppressWarnings("unused")
     public GameData setState(State state) {
         return new GameData(this.gameID, this.whiteUsername, this.blackUsername, this.gameName, this.game, state);
     }

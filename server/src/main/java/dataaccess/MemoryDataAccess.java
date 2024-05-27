@@ -79,9 +79,5 @@ public class MemoryDataAccess implements DataAccess {
         return games.values();
     }
 
-
-    public String description() {
-        return "Memory Database";
-    }
 }
 

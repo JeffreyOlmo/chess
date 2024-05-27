@@ -63,18 +63,6 @@ public class Server {
         });
     }
 
-    private String toJson(Object object) {
-        return new Gson().toJson(object);
-    }
-
-    private Map<Object, Object> formatResponse(Object... props) {
-        Map<Object, Object> map = new HashMap<>();
-        for (var i = 0; i + 1 < props.length; i = i + 2) {
-            map.put(props[i], props[i + 1]);
-        }
-        return map;
-    }
-
     public void stop() {
         Spark.stop();
     }

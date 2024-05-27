@@ -15,6 +15,7 @@ public class JoinRequest {
         return playerColor;
     }
 
+    @SuppressWarnings("unused")
     public void setPlayerColor(ChessGame.TeamColor playerColor) {
         this.playerColor = playerColor;
     }
@@ -23,6 +24,7 @@ public class JoinRequest {
         return gameID;
     }
 
+    @SuppressWarnings("unused")
     public void setGameID(int gameID) {
         this.gameID = gameID;
     }
