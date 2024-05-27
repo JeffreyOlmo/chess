@@ -62,6 +62,8 @@ public class MemoryDataAccess implements DataAccess {
         games.put(gameData.getGameID(), gameData);
         gameData.getGame().getBoard().resetBoard();
         gameData.getGame().setTeamTurn(ChessGame.TeamColor.WHITE);
+
+
         return gameData;
     }
 

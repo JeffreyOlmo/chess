@@ -41,16 +41,17 @@ public class GameService {
             } else if (loadedGame.isGameOver()) {
                 throw new CodedException(403, "Game is over");
             } else {
-                assignColorToPlayer(username, color, loadedGame);
-                dataAccess.updateGame(loadedGame);
+                loadedGame = assignColorToPlayer(username, color, loadedGame);
             }
+            dataAccess.updateGame(loadedGame);
             return loadedGame;
         } catch (DataAccessException ignored) {
             throw new CodedException(500, "Server error");
         }
     }
 
-    private void assignColorToPlayer(String username, ChessGame.TeamColor color, GameData loadedGame) throws CodedException {
+    private GameData assignColorToPlayer(String username, ChessGame.TeamColor color, GameData loadedGame) throws CodedException {
+
         if (color == ChessGame.TeamColor.WHITE) {
             if (loadedGame.getWhiteUsername() == null || loadedGame.getWhiteUsername().equals(username)) {
                 loadedGame = loadedGame.setWhite(username);
@@ -63,6 +64,9 @@ public class GameService {
             } else {
                 throw new CodedException(403, "Color taken");
             }
+        } else {
+            throw new CodedException(400, "Invalid player color");
         }
+        return loadedGame;
     }
 }

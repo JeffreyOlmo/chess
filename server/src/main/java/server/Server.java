@@ -45,10 +45,15 @@ public class Server {
         Spark.delete("/db", this::clearApplication);
         Spark.post("/user", this::registerUser);
         Spark.delete("/session", this::deleteSession);
+        Spark.post("/session", this::login);
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
         Spark.afterAfter(this::log);
+
+        Spark.get("/", (req, res) -> {
+            return "CS 240 Chess Server Web API";
+        });
 
         Spark.exception(CodedException.class, this::errorHandler);
         Spark.exception(Exception.class, (e, req, res) -> errorHandler(new CodedException(500, e.getMessage()), req, res));
@@ -104,7 +109,7 @@ public class Server {
      * Endpoint for [POST] /session
      * <pre>{ "username":"", "password":"" }</pre>
      */
-    public Object createSession(Request req, Response ignore) throws CodedException {
+    public Object login(Request req, Response ignore) throws CodedException {
         var user = getBody(req, UserData.class);
         var authData = authService.createSession(user);
         return send("username", user.getUsername(), "authToken", authData.getAuthToken());
@@ -146,6 +151,10 @@ public class Server {
     public Object joinGame(Request req, Response ignoreRes) throws CodedException {
         var authData = throwIfUnauthorized(req);
         var joinReq = getBody(req, JoinRequest.class);
+
+        if (joinReq.getPlayerColor() == null) {
+            throw new CodedException(400, "Invalid player color");
+        }
         gameService.joinGame(authData.getUsername(), joinReq.getPlayerColor(), joinReq.getGameID());
         return send();
     }
