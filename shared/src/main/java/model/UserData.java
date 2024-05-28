@@ -18,28 +18,8 @@ public class UserData {
         return username;
     }
 
-    @SuppressWarnings("unused")
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getPassword() {
         return password;
-    }
-
-    @SuppressWarnings("unused")
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @SuppressWarnings("unused")
-    public String getEmail() {
-        return email;
-    }
-
-    @SuppressWarnings("unused")
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     // toString method using Gson

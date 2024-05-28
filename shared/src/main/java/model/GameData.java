@@ -49,10 +49,6 @@ public class GameData {
         return game;
     }
 
-    public State getState() {
-        return state;
-    }
-
     // Methods from original record
     public boolean isGameOver() {
         return state != State.UNDECIDED;
@@ -64,16 +60,6 @@ public class GameData {
 
     public GameData setBlack(String userName) {
         return new GameData(this.gameID, this.whiteUsername, userName, this.gameName, this.game, this.state);
-    }
-
-    @SuppressWarnings("unused")
-    public void clearBoard() {
-        this.game = null;
-    }
-
-    @SuppressWarnings("unused")
-    public GameData setState(State state) {
-        return new GameData(this.gameID, this.whiteUsername, this.blackUsername, this.gameName, this.game, state);
     }
 
     @Override
