@@ -1,14 +1,10 @@
-package java.service;
+package service;
 
 import dataaccess.MemoryDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.AdminService;
-import service.AuthService;
-import service.GameService;
-import service.UserService;
 import util.CodedException;
 
 import java.util.ArrayList;
