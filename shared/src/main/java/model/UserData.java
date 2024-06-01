@@ -3,9 +3,9 @@ package model;
 import com.google.gson.Gson;
 
 public class UserData {
-    private String username;
-    private String password;
-    private String email;
+    public String username;
+    public String password;
+    public String email;
 
     // Constructor
     public UserData(String username, String password, String email) {
