@@ -1,5 +1,6 @@
 package dataaccess;
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.*;
 import java.sql.*;
 import java.util.*;
@@ -141,7 +142,7 @@ public class MySqlDataAccess implements DataAccess {
         var gameName = rs.getString("gameName");
         var whitePlayerName = rs.getString("whitePlayerName");
         var blackPlayerName = rs.getString("blackPlayerName");
-        var game = ChessGame.create(gs);
+        var game = new Gson().fromJson(gs, ChessGame.class);
         var state = GameData.State.valueOf(rs.getString("state"));
 
         return new GameData(gameID, whitePlayerName, blackPlayerName, gameName, game, state);
@@ -161,6 +162,35 @@ public class MySqlDataAccess implements DataAccess {
             throw new DataAccessException(String.format("Unable to configure database: %s", e.getMessage()));
         }
     }
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS authentication (
+              `authToken` varchar(100) NOT NULL,
+              `username` varchar(100) NOT NULL,
+              PRIMARY KEY (`authToken`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  game (
+              `gameID` int NOT NULL AUTO_INCREMENT,
+              `gameName` varchar(45) DEFAULT NULL,
+              `whitePlayerName` varchar(100) DEFAULT NULL,
+              `blackPlayerName` varchar(100) DEFAULT NULL,
+              `game` longtext NOT NULL,
+              `state` varchar(45) DEFAULT NULL,
+              PRIMARY KEY (`gameID`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS user (
+              `username` varchar(45) NOT NULL,
+              `password` varchar(45) NOT NULL,
+              `email` varchar(45) NOT NULL,
+              PRIMARY KEY (`username`),
+              UNIQUE KEY `username_UNIQUE` (`username`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """};
 
     private void executeCommand(String statement) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
