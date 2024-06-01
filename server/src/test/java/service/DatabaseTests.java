@@ -56,7 +56,8 @@ public class DatabaseTests {
 
         //join the game
         serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID()), auth);
-
+        System.out.println(initialRowCount);
+        System.out.println(getDatabaseRows());
         Assertions.assertTrue(initialRowCount < getDatabaseRows(), "No new data added to database");
 
         // Test that we can read the data after a restart
@@ -122,12 +123,17 @@ public class DatabaseTests {
     private int getDatabaseRows() {
         int rows = 0;
         try (Connection conn = getConnection();) {
+            System.out.println("connection works");
             try (var statement = conn.createStatement()) {
+                System.out.println("create statement works");
                 for (String table : getTables(conn)) {
                     var sql = "SELECT count(*) FROM " + table;
                     try (var resultSet = statement.executeQuery(sql)) {
+                        System.out.println("result set works");
                         if (resultSet.next()) {
+                            System.out.println("adding to rows");
                             rows += resultSet.getInt(1);
+                            System.out.println("rows: "+rows);
                         }
                     }
                 }
