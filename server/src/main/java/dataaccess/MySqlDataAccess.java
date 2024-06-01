@@ -18,6 +18,21 @@ public class MySqlDataAccess implements DataAccess {
         executeCommand("DELETE FROM `game`");
     }
 
+    private void configureDatabase() throws DataAccessException {
+        try {
+            DatabaseManager.createDatabase();
+            try (var conn = DatabaseManager.getConnection()) {
+                for (var statement : createStatements) {
+                    try (var preparedStatement = conn.prepareStatement(statement)) {
+                        preparedStatement.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", e.getMessage()));
+        }
+    }
+
     public UserData writeUser(UserData user) throws DataAccessException {
         if (user.username != null) {
             var u = new UserData(user.username, user.password, user.email);
@@ -148,20 +163,6 @@ public class MySqlDataAccess implements DataAccess {
         return new GameData(gameID, whitePlayerName, blackPlayerName, gameName, game, state);
     }
 
-    private void configureDatabase() throws DataAccessException {
-        try {
-            DatabaseManager.createDatabase();
-            try (var conn = DatabaseManager.getConnection()) {
-                for (var statement : createStatements) {
-                    try (var preparedStatement = conn.prepareStatement(statement)) {
-                        preparedStatement.executeUpdate();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", e.getMessage()));
-        }
-    }
 
     private final String[] createStatements = {
             """
