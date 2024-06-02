@@ -1,5 +1,8 @@
 package chess;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 /**
@@ -278,6 +281,20 @@ public class ChessGame {
     }
     public boolean isInStalemate(TeamColor teamColor) {
         return (isInStalemateHelper(teamColor) && !isInCheck(teamColor));
+    }
+
+    public static ChessGame fromJson(String json) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(ChessGame.class, new ChessGameDeserializer())
+                .create();
+        return gson.fromJson(json, ChessGame.class);
+    }
+
+    public String toJson() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(ChessGame.class, new ChessGameSerializer())
+                .create();
+        return gson.toJson(this);
     }
 
 

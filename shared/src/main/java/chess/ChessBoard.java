@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class ChessBoard {
 
-    private Map<ChessPosition, ChessPiece> board;
+    public Map<ChessPosition, ChessPiece> board;
 
     public ChessBoard() {
         this.board = new HashMap<>();

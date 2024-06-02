@@ -97,7 +97,7 @@ public class MySqlDataAccess implements DataAccess {
                 gameName,
                 null,
                 null,
-                game.toString(),
+                game.toJson(),
                 state.toString());
         if (ID != 0) {
             return new GameData(ID, null, null, gameName, game, state);
@@ -111,8 +111,8 @@ public class MySqlDataAccess implements DataAccess {
                 gameData.getGameName(),
                 gameData.getWhiteUsername(),
                 gameData.getBlackUsername(),
-                gameData.getGame().toString(),
-                gameData.toString(),
+                gameData.getGame().toJson(),
+                gameData.getState().toString(),
                 gameData.getGameID());
     }
 
@@ -157,7 +157,7 @@ public class MySqlDataAccess implements DataAccess {
         var gameName = rs.getString("gameName");
         var whitePlayerName = rs.getString("whitePlayerName");
         var blackPlayerName = rs.getString("blackPlayerName");
-        var game = new Gson().fromJson(gs, ChessGame.class);
+        var game = ChessGame.fromJson(gs);
         var state = GameData.State.valueOf(rs.getString("state"));
 
         return new GameData(gameID, whitePlayerName, blackPlayerName, gameName, game, state);

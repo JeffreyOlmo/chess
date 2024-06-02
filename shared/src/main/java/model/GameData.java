@@ -2,6 +2,7 @@ package model;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class GameData {
     private int gameID;
@@ -49,6 +50,10 @@ public class GameData {
         return game;
     }
 
+    public State getState() {
+        return state;
+    }
+
     // Methods from original record
     public boolean isGameOver() {
         return state != State.UNDECIDED;
@@ -60,10 +65,5 @@ public class GameData {
 
     public GameData setBlack(String userName) {
         return new GameData(this.gameID, this.whiteUsername, userName, this.gameName, this.game, this.state);
-    }
-
-    @Override
-    public String toString() {
-        return new Gson().toJson(this);
     }
 }
