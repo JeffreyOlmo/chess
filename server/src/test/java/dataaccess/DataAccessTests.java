@@ -1,9 +1,14 @@
 package dataaccess;
 
 import model.UserData;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import passoff.server.TestServerFacade;
+import server.Server;
 
 import java.util.List;
 
@@ -13,6 +18,29 @@ public class DataAccessTests {
         DataAccess db = databaseClass.getDeclaredConstructor().newInstance();
         db.clear();
         return db;
+    }
+
+    private static TestServerFacade serverFacade;
+    private static Server server;
+
+
+    @BeforeAll
+    public static void startServer() {
+        server = new Server();
+        var port = server.run(0);
+        System.out.println("Started test HTTP server on " + port);
+
+        serverFacade = new TestServerFacade("localhost", Integer.toString(port));
+    }
+
+    @BeforeEach
+    public void setUp() {
+        serverFacade.clear();
+    }
+
+    @AfterAll
+    static void stopServer() {
+        server.stop();
     }
 
     @ParameterizedTest
