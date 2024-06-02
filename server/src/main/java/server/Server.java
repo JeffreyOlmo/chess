@@ -73,8 +73,8 @@ public class Server {
     public Object errorHandler(CodedException e, Request req, Response res) {
         var body = new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false));
         res.type("application/json");
-        res.status(e.statusCode());
         res.body(body);
+        res.status(e.statusCode());
         return body;
     }
     private void log(Request req, Response res) {

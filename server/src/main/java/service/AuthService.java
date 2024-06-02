@@ -23,11 +23,11 @@ public class AuthService {
     public AuthData createSession(UserData user) throws CodedException {
         try {
             UserData loggedInUser = dataAccess.readUser(user.getUsername());
-
+            System.out.println((loggedInUser != null && BCrypt.checkpw(user.getPassword(), loggedInUser.getPassword())));
             if (loggedInUser != null && BCrypt.checkpw(user.getPassword(), loggedInUser.getPassword())) {
                 return dataAccess.writeAuth(loggedInUser.getUsername());
             }
-
+            System.out.println("Throwing Coded exception 401");
             throw new CodedException(401, "Invalid username or password");
         } catch (DataAccessException ex) {
             throw new CodedException(500, "Internal server error");
