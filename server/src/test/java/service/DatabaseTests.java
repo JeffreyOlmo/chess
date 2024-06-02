@@ -57,9 +57,6 @@ public class DatabaseTests {
         //join the game
         serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID()), auth);
         TestListResult listResult = serverFacade.listGames(auth);
-        System.out.println(listResult.getGames()[0].getWhiteUsername());
-        System.out.println(initialRowCount);
-        System.out.println(getDatabaseRows());
         Assertions.assertTrue(initialRowCount < getDatabaseRows(), "No new data added to database");
 
         // Test that we can read the data after a restart
@@ -141,8 +138,6 @@ public class DatabaseTests {
                             ResultSetMetaData rsmd = resultSet2.getMetaData();
                             int columnsNumber = rsmd.getColumnCount();
                             for (int i = 1; i <= columnsNumber; i++) {
-                                String columnValue = resultSet2.getString(i);
-                                System.out.print(columnValue + " " + rsmd.getColumnName(i));
                                 if (i < columnsNumber) System.out.print(",  ");
                             }
                             System.out.println("");

@@ -6,6 +6,8 @@ import model.*;
 import service.*;
 import spark.*;
 import util.CodedException;
+
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -41,7 +43,9 @@ public class Server {
 
     private void configureSpark(int desiredPort) {
         Spark.port(desiredPort);
-        Spark.externalStaticFileLocation("web");
+
+        var webDir = Paths.get(Server.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "web");
+        Spark.externalStaticFileLocation(webDir.toString());
         Spark.delete("/db", this::clearApplication);
         Spark.post("/user", this::registerUser);
         Spark.delete("/session", this::deleteSession);
