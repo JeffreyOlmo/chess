@@ -2,6 +2,8 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.*;
 import java.util.*;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -34,8 +36,11 @@ public class MySqlDataAccess implements DataAccess {
     }
 
     public UserData writeUser(UserData user) throws DataAccessException {
+        String hashedPassword;
+
         if (user.username != null) {
-            var u = new UserData(user.username, user.password, user.email);
+            hashedPassword = BCrypt.hashpw(user.password, BCrypt.gensalt());
+            var u = new UserData(user.username, hashedPassword, user.email);
             executeUpdate("INSERT INTO `user` (username, password, email) VALUES (?, ?, ?)", u.username, u.password, u.email);
             return user;
         }
@@ -186,7 +191,7 @@ public class MySqlDataAccess implements DataAccess {
             """
             CREATE TABLE IF NOT EXISTS user (
               `username` varchar(45) NOT NULL,
-              `password` varchar(45) NOT NULL,
+              `password` varchar(60) NOT NULL,
               `email` varchar(45) NOT NULL,
               PRIMARY KEY (`username`),
               UNIQUE KEY `username_UNIQUE` (`username`)

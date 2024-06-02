@@ -3,19 +3,33 @@ package service;
 import dataaccess.DataAccessException;
 import dataaccess.MySqlDataAccess;
 import model.UserData;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import passoff.server.TestServerFacade;
+import server.Server;
 import util.CodedException;
 import service.UserService;
 
 public class UserServiceTests {
 
-    @Test
-    public void registerUser() throws DataAccessException {
-        var service = new UserService(new MySqlDataAccess());
-        var user = new UserData("joe", "password", "joe@byu.edu");
+    private UserService service;
+    private MySqlDataAccess dataAccess;
 
-        Assertions.assertDoesNotThrow(() -> service.registerUser(user));
+    @BeforeEach
+    public void setup() {
+        try{
+            dataAccess = new MySqlDataAccess();
+            service = new UserService(dataAccess);
+        }
+        catch (DataAccessException e){}
+    }
+
+    @AfterEach
+    public void tearDown() {
+        try{
+            dataAccess.clear();
+        }
+        catch (DataAccessException e){}
+
     }
 
 

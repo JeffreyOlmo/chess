@@ -6,6 +6,8 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import util.CodedException;
+import org.mindrot.jbcrypt.BCrypt;
+
 
 /**
  * Provides endpoints for authorizing access.
@@ -21,9 +23,11 @@ public class AuthService {
     public AuthData createSession(UserData user) throws CodedException {
         try {
             UserData loggedInUser = dataAccess.readUser(user.getUsername());
-            if (loggedInUser != null && loggedInUser.getPassword().equals(user.getPassword())) {
+
+            if (loggedInUser != null && BCrypt.checkpw(user.getPassword(), loggedInUser.getPassword())) {
                 return dataAccess.writeAuth(loggedInUser.getUsername());
             }
+
             throw new CodedException(401, "Invalid username or password");
         } catch (DataAccessException ex) {
             throw new CodedException(500, "Internal server error");
