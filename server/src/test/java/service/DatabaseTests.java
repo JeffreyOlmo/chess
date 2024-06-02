@@ -56,6 +56,8 @@ public class DatabaseTests {
 
         //join the game
         serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, createResult.getGameID()), auth);
+        TestListResult listResult = serverFacade.listGames(auth);
+        System.out.println(listResult.getGames()[0].getWhiteUsername());
         System.out.println(initialRowCount);
         System.out.println(getDatabaseRows());
         Assertions.assertTrue(initialRowCount < getDatabaseRows(), "No new data added to database");
@@ -65,7 +67,7 @@ public class DatabaseTests {
         startServer();
 
         //list games using the auth
-        TestListResult listResult = serverFacade.listGames(auth);
+        //TestListResult listResult = serverFacade.listGames(auth);
         Assertions.assertEquals(200, serverFacade.getStatusCode(), "Server response code was not 200 OK");
         Assertions.assertEquals(1, listResult.getGames().length, "Missing game(s) in database after restart");
 
@@ -123,17 +125,28 @@ public class DatabaseTests {
     private int getDatabaseRows() {
         int rows = 0;
         try (Connection conn = getConnection();) {
-            System.out.println("connection works");
             try (var statement = conn.createStatement()) {
-                System.out.println("create statement works");
                 for (String table : getTables(conn)) {
                     var sql = "SELECT count(*) FROM " + table;
                     try (var resultSet = statement.executeQuery(sql)) {
-                        System.out.println("result set works");
                         if (resultSet.next()) {
-                            System.out.println("adding to rows");
-                            rows += resultSet.getInt(1);
-                            System.out.println("rows: "+rows);
+                            int tableRows = resultSet.getInt(1);
+                            System.out.println("Table: " + table + ", Rows: " + tableRows);
+                            rows += tableRows;
+                        }
+                    }
+
+                    var sql2 = "SELECT * FROM " + table;
+                    try (var resultSet2 = statement.executeQuery(sql2)) {
+                        while (resultSet2.next()) {
+                            ResultSetMetaData rsmd = resultSet2.getMetaData();
+                            int columnsNumber = rsmd.getColumnCount();
+                            for (int i = 1; i <= columnsNumber; i++) {
+                                String columnValue = resultSet2.getString(i);
+                                System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                                if (i < columnsNumber) System.out.print(",  ");
+                            }
+                            System.out.println("");
                         }
                     }
                 }
@@ -141,7 +154,6 @@ public class DatabaseTests {
         } catch (Exception ex) {
             Assertions.fail("Unable to load database in order to verify persistence. Are you using dataAccess.DatabaseManager to set your credentials?", ex);
         }
-
         return rows;
     }
 

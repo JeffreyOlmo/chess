@@ -1,6 +1,7 @@
 package service;
 
-import dataaccess.MemoryDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.MySqlDataAccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
@@ -12,8 +13,8 @@ import util.CodedException;
 public class AuthServiceTests {
 
     @Test
-    public void createSessionPositive() throws CodedException {
-        var dataAccess = new MemoryDataAccess();
+    public void createSessionPositive() throws CodedException, DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var userService = new UserService(dataAccess);
         var user = new UserData("bob", "password", "bob@byu.edu");
         userService.registerUser(user);
@@ -23,16 +24,16 @@ public class AuthServiceTests {
     }
 
     @Test
-    public void createSessionNegative() {
-        var dataAccess = new MemoryDataAccess();
+    public void createSessionNegative() throws DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var authService = new AuthService(dataAccess);
         var nonRegisteredUser = new UserData("nonRegisteredUser", "password", "user@byu.edu");
         Assertions.assertThrows(CodedException.class, () -> authService.createSession(nonRegisteredUser));
     }
 
     @Test
-    public void deleteSessionPositive() throws CodedException {
-        var dataAccess = new MemoryDataAccess();
+    public void deleteSessionPositive() throws CodedException, DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var userService = new UserService(dataAccess);
         var user = new UserData("bob", "password", "bob@byu.edu");
         userService.registerUser(user);
@@ -44,16 +45,16 @@ public class AuthServiceTests {
     }
 
     @Test
-    public void deleteSessionNegative() {
-        var dataAccess = new MemoryDataAccess();
+    public void deleteSessionNegative() throws DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var authService = new AuthService(dataAccess);
 
         Assertions.assertDoesNotThrow(() -> authService.deleteSession("invalidToken"));
     }
 
     @Test
-    public void getAuthDataPositiveTest() throws CodedException {
-        var dataAccess = new MemoryDataAccess();
+    public void getAuthDataPositiveTest() throws CodedException, DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var userService = new UserService(dataAccess);
         var user = new UserData("bob", "password", "bob@byu.edu");
         userService.registerUser(user);
@@ -64,8 +65,8 @@ public class AuthServiceTests {
     }
 
     @Test
-    public void getAuthDataNegativeTest() {
-        var dataAccess = new MemoryDataAccess();
+    public void getAuthDataNegativeTest() throws DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var authService = new AuthService(dataAccess);
 
         try {

@@ -1,6 +1,7 @@
 package service;
 
-import dataaccess.MemoryDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.MySqlDataAccess;
 import model.GameData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,8 @@ import chess.ChessGame;
 public class GameServiceTests {
 
     @Test
-    public void createGamePositive() {
-        var dataAccess = new MemoryDataAccess();
+    public void createGamePositive() throws DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var gameService = new GameService(dataAccess);
         Assertions.assertDoesNotThrow(() -> gameService.createGame("Chess Game 1"));
     }
@@ -23,23 +24,23 @@ public class GameServiceTests {
     }
 
     @Test
-    public void joinGamePositive() throws CodedException {
-        var dataAccess = new MemoryDataAccess();
+    public void joinGamePositive() throws CodedException, DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var gameService = new GameService(dataAccess);
         GameData gameData = gameService.createGame("Chess Game 2");
         Assertions.assertDoesNotThrow(() -> gameService.joinGame("bob", ChessGame.TeamColor.WHITE, gameData.getGameID()));
     }
 
     @Test
-    public void joinGameNegativeInvalidGame() {
-        var dataAccess = new MemoryDataAccess();
+    public void joinGameNegativeInvalidGame() throws DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var gameService = new GameService(dataAccess);
         Assertions.assertThrows(CodedException.class, () -> gameService.joinGame("bob", ChessGame.TeamColor.WHITE, 999999));
     }
 
     @Test
-    public void joinGameNegativeInvalidColor() throws CodedException {
-        var dataAccess = new MemoryDataAccess();
+    public void joinGameNegativeInvalidColor() throws CodedException, DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var gameService = new GameService(dataAccess);
         GameData gameData = gameService.createGame("Chess Game 3");
         gameService.joinGame("bob", ChessGame.TeamColor.WHITE, gameData.getGameID());
@@ -47,23 +48,23 @@ public class GameServiceTests {
     }
 
     @Test
-    public void listGamesPositive() {
-        var dataAccess = new MemoryDataAccess();
+    public void listGamesPositive() throws DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var gameService = new GameService(dataAccess);
         Assertions.assertDoesNotThrow(gameService::listGames);
     }
 
     @Test
-    public void joinGamePositiveAssignColor() throws CodedException {
-        var dataAccess = new MemoryDataAccess();
+    public void joinGamePositiveAssignColor() throws CodedException, DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var gameService = new GameService(dataAccess);
         GameData gameData = gameService.createGame("Chess Game X1");
         Assertions.assertDoesNotThrow(() -> gameService.joinGame("bob", ChessGame.TeamColor.WHITE, gameData.getGameID()));
     }
 
     @Test
-    public void joinGameNegativeAssignColor() throws CodedException {
-        var dataAccess = new MemoryDataAccess();
+    public void joinGameNegativeAssignColor() throws CodedException, DataAccessException {
+        var dataAccess = new MySqlDataAccess();
         var gameService = new GameService(dataAccess);
         GameData gameData = gameService.createGame("Chess Game X2");
         gameService.joinGame("bob", ChessGame.TeamColor.WHITE, gameData.getGameID());

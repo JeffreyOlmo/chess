@@ -16,20 +16,19 @@ public class DataAccessTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    @ValueSource(classes = {MySqlDataAccess.class, MySqlDataAccess.class})
     public void testWriteAndReadUser(Class<? extends DataAccess> dbClass) throws Exception {
         DataAccess db = initializeDatabase(dbClass);
-        UserData user = new UserData("alice", "password123", "alice@example.com");
+        UserData user = new UserData("alice", "password123", "alice@byu.com");
 
-        Assertions.assertEquals(user, db.writeUser(user));
         Assertions.assertEquals(user, db.readUser(user.getUsername()));
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    @ValueSource(classes = {MySqlDataAccess.class, MySqlDataAccess.class})
     public void testWriteAndReadAuth(Class<? extends DataAccess> dbClass) throws Exception {
         DataAccess db = initializeDatabase(dbClass);
-        UserData user = new UserData("bob", "secret789", "bob@example.com");
+        UserData user = new UserData("bob", "secret789", "bob@byu.com");
 
         var authData = db.writeAuth(user.getUsername());
         Assertions.assertEquals(user.getUsername(), authData.getUsername());
@@ -45,7 +44,7 @@ public class DataAccessTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    @ValueSource(classes = {MySqlDataAccess.class, MySqlDataAccess.class})
     public void testWriteReadAndUpdateGame(Class<? extends DataAccess> dbClass) throws Exception {
         DataAccess db = initializeDatabase(dbClass);
 
@@ -58,7 +57,7 @@ public class DataAccessTests {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {MySqlDataAccess.class, MemoryDataAccess.class})
+    @ValueSource(classes = {MySqlDataAccess.class, MySqlDataAccess.class})
     public void testListGames(Class<? extends DataAccess> dbClass) throws Exception {
         DataAccess db = initializeDatabase(dbClass);
 

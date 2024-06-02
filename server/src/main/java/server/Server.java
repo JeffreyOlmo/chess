@@ -1,7 +1,7 @@
 package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
-import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import model.*;
 import service.*;
 import spark.*;
@@ -32,7 +32,7 @@ public class Server {
     }
 
     private void initializeServices() throws Exception {
-        dataAccess = new MemoryDataAccess();
+        dataAccess = new MySqlDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
         adminService = new AdminService(dataAccess);

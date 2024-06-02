@@ -1,6 +1,7 @@
 package service;
 
-import dataaccess.MemoryDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.MySqlDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,12 +12,12 @@ import java.util.ArrayList;
 
 public class AdminServiceTests {
 
-    private MemoryDataAccess dataAccess;
+    private MySqlDataAccess dataAccess;
     private AdminService service;
 
     @BeforeEach
-    public void setup(){
-        dataAccess = new MemoryDataAccess();
+    public void setup() throws DataAccessException {
+        dataAccess = new MySqlDataAccess();
         service = new AdminService(dataAccess);
     }
 
@@ -36,7 +37,7 @@ public class AdminServiceTests {
 
     @Test
     public void clear() throws Exception {
-        var memoryDataAccess = new MemoryDataAccess();
+        var memoryDataAccess = new MySqlDataAccess();
         var userService = new UserService(memoryDataAccess);
         var user = new UserData("jeff", "password", "jeff@byu.edu");
         var authData = userService.registerUser(user);
