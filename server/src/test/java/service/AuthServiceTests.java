@@ -11,30 +11,8 @@ import service.AuthService;
 import service.UserService;
 import util.CodedException;
 
-public class AuthServiceTests {
+public class AuthServiceTests extends BaseTest {
 
-    private static TestServerFacade serverFacade;
-    private static Server server;
-
-
-    @BeforeAll
-    public static void startServer() {
-        server = new Server();
-        var port = server.run(0);
-        System.out.println("Started test HTTP server on " + port);
-
-        serverFacade = new TestServerFacade("localhost", Integer.toString(port));
-    }
-
-    @BeforeEach
-    public void setUp() {
-        serverFacade.clear();
-    }
-
-    @AfterAll
-    static void stopServer() {
-        server.stop();
-    }
 
     @Test
     public void createSessionPositive() throws CodedException, DataAccessException {

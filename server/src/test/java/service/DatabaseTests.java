@@ -12,32 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DatabaseTests {
-
-    private static TestServerFacade serverFacade;
-    private static Server server;
-
-
-    @BeforeAll
-    public static void startServer() {
-        server = new Server();
-        var port = server.run(0);
-        System.out.println("Started test HTTP server on " + port);
-
-        serverFacade = new TestServerFacade("localhost", Integer.toString(port));
-    }
-
-    @BeforeEach
-    public void setUp() {
-        serverFacade.clear();
-    }
-
-    @AfterAll
-    static void stopServer() {
-        server.stop();
-    }
-
-
+public class DatabaseTests extends BaseTest {
 
     @Test
     @DisplayName("Persistence Test")

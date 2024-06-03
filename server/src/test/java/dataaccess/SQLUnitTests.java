@@ -28,7 +28,7 @@ public class SQLUnitTests {
     }
 
     @Test
-    public void testWriteUser_Positive() {
+    public void testWriteUserPositive() {
         try {
             UserData user = new UserData("testUser", "testPassword", "test@example.com");
             UserData result = dataAccess.writeUser(user);
@@ -41,7 +41,7 @@ public class SQLUnitTests {
 
     //This is negative case where we trying to write user with same username
     @Test
-    public void testWriteUser_Negative() {
+    public void testWriteUserNegative() {
         try {
             UserData user = new UserData("testUser", "testPassword", "test@example.com");
             dataAccess.writeUser(user);
@@ -52,7 +52,7 @@ public class SQLUnitTests {
     }
 
     @Test
-    public void testReadUser_Positive() {
+    public void testReadUserPositive() {
         try {
             UserData user = new UserData("testUser", "testPassword", "test@example.com");
             dataAccess.writeUser(user);
@@ -66,7 +66,7 @@ public class SQLUnitTests {
 
     //This negative case is for the scenario when we are trying to read nonexistent user
     @Test
-    public void testReadUser_Negative() {
+    public void testReadUserNegative() {
         String wrongUsername = "wrongUser";
         try{
             Assertions.assertNull(dataAccess.readUser(wrongUsername));
@@ -77,7 +77,7 @@ public class SQLUnitTests {
     }
 
     @Test
-    public void testWriteAuth_Positive() {
+    public void testWriteAuthPositive() {
         try {
             String username = "testUser";
             AuthData authData = dataAccess.writeAuth(username);
@@ -91,7 +91,7 @@ public class SQLUnitTests {
     }
 
     @Test
-    public void testReadAuth_Positive() {
+    public void testReadAuthPositive() {
         try {
             String username = "testUser";
             AuthData authData = dataAccess.writeAuth(username);
@@ -107,7 +107,7 @@ public class SQLUnitTests {
     }
 
     @Test
-    public void testReadAuth_Negative() {
+    public void testReadAuthNegative() {
         String wrongAuthToken = "wrongToken";
         try{
             Assertions.assertNull(dataAccess.readAuth(wrongAuthToken));
@@ -115,7 +115,7 @@ public class SQLUnitTests {
     }
 
     @Test
-    public void testDeleteAuth_Positive() {
+    public void testDeleteAuthPositive() {
         try {
             String username = "testUser";
             AuthData authData = dataAccess.writeAuth(username);
@@ -151,7 +151,7 @@ public class SQLUnitTests {
     }
 
     @Test
-    public void testNewGame_Positive() {
+    public void testNewGamePositive() {
         try {
             GameData gameData = createNewGame();
             verifyGameData(gameData, dataAccess.readGame(gameData.getGameID()));
@@ -162,7 +162,7 @@ public class SQLUnitTests {
 
     // Attempt to create a new game with a null game name
     @Test
-    public void testNewGame_Negative() {
+    public void testNewGameNegative() {
         try{
             Assertions.assertNull(dataAccess.newGame(null));
         } catch(DataAccessException e) {}
@@ -170,7 +170,7 @@ public class SQLUnitTests {
 
 
     @Test
-    public void testReadGame_Positive() {
+    public void testReadGamePositive() {
         try {
             GameData originalGameData = createNewGame();
             System.out.println(dataAccess.readGame(originalGameData.getGameID()));
@@ -182,7 +182,7 @@ public class SQLUnitTests {
 
     // Attempt to read a game that does not exist
     @Test
-    public void testReadGame_Negative() {
+    public void testReadGameNegative() {
         int nonExistentGameId = -1;
         try {
             Assertions.assertNull(dataAccess.readGame(nonExistentGameId));
@@ -192,7 +192,7 @@ public class SQLUnitTests {
     }
 
     @Test
-    public void testUpdateGame_Positive() {
+    public void testUpdateGamePositive() {
         try {
             GameData originalGameData = createNewGame();
             // Update the game using setWhite method
@@ -207,7 +207,7 @@ public class SQLUnitTests {
 
     // Attempt to update a game with null game data
     @Test
-    public void testUpdateGame_Negative() {
+    public void testUpdateGameNegative() {
         Assertions.assertThrows(NullPointerException.class, () -> dataAccess.updateGame(null));
     }
 }

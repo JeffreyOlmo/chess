@@ -1,6 +1,5 @@
 package dataaccess;
 import chess.ChessGame;
-import com.google.gson.Gson;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -98,14 +97,14 @@ public class MySqlDataAccess implements DataAccess {
         var game = new ChessGame();
         game.getBoard().resetBoard();
         var state = GameData.State.UNDECIDED;
-        var ID = executeUpdate("INSERT INTO `game` (gameName, whitePlayerName, blackPlayerName, game, state) VALUES (?, ?, ?, ?, ?)",
+        var iD = executeUpdate("INSERT INTO `game` (gameName, whitePlayerName, blackPlayerName, game, state) VALUES (?, ?, ?, ?, ?)",
                 gameName,
                 null,
                 null,
                 game.toJson(),
                 state.toString());
-        if (ID != 0 && gameName != null) {
-            return new GameData(ID, null, null, gameName, game, state);
+        if (iD != 0 && gameName != null) {
+            return new GameData(iD, null, null, gameName, game, state);
         }
 
         return null;
