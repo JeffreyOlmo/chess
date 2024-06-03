@@ -79,15 +79,16 @@ public class MySqlDataAccess implements DataAccess {
             try (var preparedStatement = conn.prepareStatement("SELECT username from `authentication` WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
                 try (var rs = preparedStatement.executeQuery()) {
-                    if (rs.next()) {
-                        return new AuthData(authToken, rs.getString("username"));
+                    if (rs.next()) {return new AuthData(authToken, rs.getString("username"));
+                    }
+                    else {
+                        throw new DataAccessException("No data found for provided authToken");
                     }
                 }
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
-        return null;
     }
 
     public void deleteAuth(String authToken) throws DataAccessException {
@@ -104,7 +105,7 @@ public class MySqlDataAccess implements DataAccess {
                 null,
                 game.toJson(),
                 state.toString());
-        if (ID != 0) {
+        if (ID != 0 && gameName != null) {
             return new GameData(ID, null, null, gameName, game, state);
         }
 
@@ -123,10 +124,14 @@ public class MySqlDataAccess implements DataAccess {
 
     public GameData readGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
+            System.out.println("got here 1");
             try (var preparedStatement = conn.prepareStatement("SELECT gameID, gameName, whitePlayerName, blackPlayerName, game, state FROM `game` WHERE gameID=?")) {
+                System.out.println("got here 2");
                 preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
+                    System.out.println("got here 3");
                     if (rs.next()) {
+                        System.out.println(readGameData(rs));
                         return readGameData(rs);
                     }
                 }

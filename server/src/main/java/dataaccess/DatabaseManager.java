@@ -64,6 +64,7 @@ public class DatabaseManager {
             conn.setCatalog(DATABASE_NAME);
             return conn;
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DataAccessException(e.getMessage());
         }
     }
