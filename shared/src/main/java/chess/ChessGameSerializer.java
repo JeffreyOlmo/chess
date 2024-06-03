@@ -6,7 +6,7 @@ import com.google.gson.JsonSerializer;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-class ChessGameSerializer implements JsonSerializer<ChessGame> {
+public class ChessGameSerializer implements JsonSerializer<ChessGame> {
     public JsonElement serialize(final ChessGame chessGame, final Type type, final JsonSerializationContext context) {
         JsonObject result = new JsonObject();
 
