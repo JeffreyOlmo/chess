@@ -79,16 +79,15 @@ public class MySqlDataAccess implements DataAccess {
             try (var preparedStatement = conn.prepareStatement("SELECT username from `authentication` WHERE authToken=?")) {
                 preparedStatement.setString(1, authToken);
                 try (var rs = preparedStatement.executeQuery()) {
-                    if (rs.next()) {return new AuthData(authToken, rs.getString("username"));
-                    }
-                    else {
-                        throw new DataAccessException("No data found for provided authToken");
+                    if (rs.next()) {
+                        return new AuthData(authToken, rs.getString("username"));
                     }
                 }
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
         }
+        return null;
     }
 
     public void deleteAuth(String authToken) throws DataAccessException {

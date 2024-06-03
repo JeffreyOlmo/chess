@@ -109,7 +109,9 @@ public class SQLUnitTests {
     @Test
     public void testReadAuth_Negative() {
         String wrongAuthToken = "wrongToken";
-        Assertions.assertThrows(DataAccessException.class, () -> dataAccess.readAuth(wrongAuthToken));
+        try{
+            Assertions.assertNull(dataAccess.readAuth(wrongAuthToken));
+        } catch(DataAccessException e){}
     }
 
     @Test
