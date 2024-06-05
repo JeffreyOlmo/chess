@@ -41,10 +41,7 @@ public class ChessClient implements DisplayHandler {
             } catch (NoSuchMethodException e) {
                 output = String.format("Unknown command\n%s", help(methodParams));
             }
-        } catch (Throwable e) {
-            Throwable rootCause = ExceptionUtil.getRoot(e);
-            output = String.format("Error: %s", rootCause.getMessage());
-        }
+        } catch (Throwable e) {}
         return output;
     }
 
@@ -53,7 +50,10 @@ public class ChessClient implements DisplayHandler {
     }
 
     private String clear(String[] ignored) throws Exception {
-
+        clear();
+        userState = State.LOGGED_OUT;
+        gameData = null;
+        return "Cleared the world";
     }
 
     private String help(String[] ignored) {
@@ -66,23 +66,57 @@ public class ChessClient implements DisplayHandler {
 
 
     private String login(String[] params) throws ResponseException {
-
+        if (userState == State.LOGGED_OUT && params.length == 2) {
+            var response = server.login(params[0], params[1]);
+            authToken = response.getAuthToken();
+            userState = State.LOGGED_IN;
+            return String.format("Logged in as %s", params[0]);
+        }
+        return "Failure";
     }
 
     private String register(String[] params) throws ResponseException {
-
+        if (userState == State.LOGGED_OUT && params.length == 3) {
+            var response = server.register(params[0], params[1], params[2]);
+            authToken = response.getAuthToken();
+            userState = State.LOGGED_IN;
+            return String.format("Logged in as %s", params[0]);
+        }
+        return "Failure";
     }
 
     private String logout(String[] ignore) throws ResponseException {
+        verifyAuth();
 
+        if (userState != State.LOGGED_OUT) {
+            server.logout(authToken);
+            userState = State.LOGGED_OUT;
+            authToken = null;
+            return "Logged out";
+        }
+        return "Failure";
     }
 
     private String create(String[] params) throws ResponseException {
+        verifyAuth();
 
+        if (params.length == 1 && userState == State.LOGGED_IN) {
+            var gameData = server.createGame(authToken, params[0]);
+            return String.format("Create %d", gameData.getGameID());
+        }
+        return "Failure";
     }
 
     private String list(String[] ignore) throws ResponseException {
-
+        verifyAuth();
+        games = server.listGames(authToken);
+        StringBuilder buf = new StringBuilder();
+        for (var i = 0; i < games.length; i++) {
+            var game = games[i];
+            var gameText = String.format("%d. %s white:%s black:%s state: %s%n", i, game.gameName(), game.whiteUsername(), game.blackUsername(), game.state());
+            buf.append(gameText);
+        }
+        return buf.toString();
     }
 
 
@@ -107,11 +141,28 @@ public class ChessClient implements DisplayHandler {
 
 
     private String observe(String[] params) throws Exception {
+        verifyAuth();
+        if (State.LOGGED_IN == userState) {
+            if (1 == params.length) {
+                int observedGameID = Integer.parseInt(params[0]);
+                gameData = server.joinGame(authToken, observedGameID, null);
+                userState = State.OBSERVING;
+                UserGameCommand.CommandType commandType = UserGameCommand.CommandType.JOIN_OBSERVER;
+                webSocket.sendCommand(new GameCommand(commandType, authToken, observedGameID));
+                return String.format("Joined %d as observer", gameData.getGameID());
+            }
+        }
 
+        return "Failure";
     }
 
     private String redraw(String[] ignored) throws Exception {
-
+        verifyAuth();
+        if (isPlaying() || isObserving()) {
+            printGame();
+            return "";
+        }
+        return "Failure";
     }
 
     private String legal(String[] params) throws Exception {
@@ -131,23 +182,46 @@ public class ChessClient implements DisplayHandler {
     }
 
     private String move(String[] params) throws Exception {
-
+        verifyAuth();
+        if (params.length == 1) {
+            var move = new ChessMove(params[0]);
+            if (isMoveLegal(move)) {
+                webSocket.sendCommand(new MoveCommand(authToken, gameData.gameID(), move));
+                return "Success";
+            }
+        }
+        return "Failure";
     }
 
     private String leave(String[] ignored) throws Exception {
-
+        if (isPlaying() || isObserving()) {
+            userState = State.LOGGED_IN;
+            webSocket.sendCommand(new GameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameData.gameID()));
+            gameData = null;
+            return "Left game";
+        }
+        return "Failure";
     }
 
     private String resign(String[] ignored) throws Exception {
-
+        if (isPlaying()) {
+            webSocket.sendCommand(new GameCommand(GameCommand.CommandType.RESIGN, authToken, gameData.gameID()));
+            userState = State.LOGGED_IN;
+            gameData = null;
+            return "Resigned";
+        }
+        return "Failure";
     }
 
     private void printGame() {
-
+        var color = userState == State.BLACK ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+        printGame(color, null);
     }
 
     private void printGame(ChessGame.TeamColor color, Collection<ChessPosition> highlights) {
-
+        System.out.println("\n");
+        System.out.print((gameData.getGame().getBoard()).toString(color, highlights));
+        System.out.println();
     }
 
     public void printPrompt() {
