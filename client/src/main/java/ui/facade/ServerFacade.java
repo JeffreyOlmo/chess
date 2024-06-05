@@ -2,85 +2,112 @@ package facade;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import requests.*;
-import responses.*;
-import java.io.*;
+import model.AuthData;
+import model.GameData;
+import server.JoinRequest;
+
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.util.Map;
 
 public class ServerFacade {
-    private final String baseUrl;
 
-    public ServerFacade(String baseUrl) {
-        this.baseUrl = baseUrl;
+    private final String serverUrl;
+
+    public ServerFacade(String serverName) {
+        serverUrl = String.format("http://%s", serverName);
     }
 
-    private <T> T sendRequest(String method, String endpoint, String requestBody, String authToken, Class<T> responseClass) throws IOException {
-        URL url = new URL(endpoint);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod(method);
-        connection.setConnectTimeout(5000);
-        connection.setReadTimeout(5000);
-        connection.setDoOutput(true);
+    public ServerFacade(int port) {
+        serverUrl = String.format("http://localhost:%d", port);
+    }
 
-        if (authToken != null) {
-            connection.setRequestProperty("Authorization", authToken);
+
+    public void clear() throws ResponseException {
+        var r = this.makeRequest("DELETE", "/db", null, null, Map.class);
+    }
+
+    public AuthData register(String username, String password, String email) throws ResponseException {
+        var request = Map.of("username", username, "password", password, "email", email);
+        return this.makeRequest("POST", "/user", request, null, AuthData.class);
+    }
+
+    public AuthData login(String username, String password) throws ResponseException {
+        var request = Map.of("username", username, "password", password);
+        return this.makeRequest("POST", "/session", request, null, AuthData.class);
+    }
+
+    public void logout(String authToken) throws ResponseException {
+        this.makeRequest("DELETE", "/session", null, authToken, null);
+    }
+
+    public GameData createGame(String authToken, String gameName) throws ResponseException {
+        var request = Map.of("gameName", gameName);
+        return this.makeRequest("POST", "/game", request, authToken, GameData.class);
+    }
+
+    public GameData[] listGames(String authToken) throws ResponseException {
+        record Response(GameData[] games) {
         }
+        var response = this.makeRequest("GET", "/game", null, authToken, Response.class);
+        return (response != null ? response.games : new GameData[0]);
+    }
 
-        if (requestBody != null) {
-            try (OutputStream os = connection.getOutputStream()) {
-                os.write(requestBody.getBytes());
+    public GameData joinGame(String authToken, int gameID, ChessGame.TeamColor color) throws ResponseException {
+        var request = new JoinRequest(color, gameID);
+        this.makeRequest("PUT", "/game", request, authToken, GameData.class);
+        return getGame(authToken, gameID);
+    }
+
+    private GameData getGame(String authToken, int gameID) throws ResponseException {
+        var games = listGames(authToken);
+        for (var game : games) {
+            if (game.getGameID() == gameID) {
+                return game;
             }
         }
+        throw new ResponseException(404, "Missing game");
+    }
 
-        int responseCode = connection.getResponseCode();
-        InputStream responseBodyStream = null;
+    private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> clazz) throws ResponseException {
+        try {
+            URL url = (new URI(serverUrl + path)).toURL();
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod(method);
+            http.setDoOutput(true);
 
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            responseBodyStream = connection.getInputStream();
-        } else {
-            responseBodyStream = connection.getErrorStream();
+            if (authToken != null) {
+                http.addRequestProperty("Authorization", authToken);
+            }
+
+            if (request != null) {
+                http.addRequestProperty("Accept", "application/json");
+                String reqData = new Gson().toJson(request);
+                try (OutputStream reqBody = http.getOutputStream()) {
+                    reqBody.write(reqData.getBytes());
+                }
+            }
+            http.connect();
+
+            try (InputStream respBody = http.getInputStream()) {
+                InputStreamReader reader = new InputStreamReader(respBody);
+                if (http.getResponseCode() == 200) {
+                    if (clazz != null) {
+                        var serializer = new Gson();
+                        return serializer.fromJson(reader, clazz);
+                    }
+                    return null;
+                }
+
+                throw new ResponseException(http.getResponseCode(), reader);
+            }
+        } catch (Exception ex) {
+            throw new ResponseException(500, ex.getMessage());
         }
-
-        InputStreamReader responseBodyReader = new InputStreamReader(responseBodyStream);
-        T responseObject = new Gson().fromJson(responseBodyReader, responseClass);
-
-        responseBodyReader.close();
-        connection.disconnect();
-
-        return responseObject;
     }
-
-    public AuthResponse registerUser(RegisterRequest request) throws IOException {
-
-    }
-
-    public AuthResponse loginUser(LoginRequest request) throws IOException {
-
-    }
-
-    public BaseResponse logoutUser(BaseRequest request, String authToken) throws IOException {
-
-    }
-
-    public CreateGameResponse createGame(CreateGameRequest request, String authToken) throws IOException {
-
-    }
-
-    public BaseResponse joinGame(JoinGameRequest request, String authToken) throws IOException {
-
-    }
-
-    public ListGamesResponse listGames(BaseRequest request, String authToken) throws IOException {
-
-    }
-
-    public BaseResponse clearDatabase(BaseRequest request) throws IOException {
-
-    }
-
-    public AccessGameResponse getChessGame(AccessGameRequest request, String authToken) throws IOException {
-
-    }
-
 }
