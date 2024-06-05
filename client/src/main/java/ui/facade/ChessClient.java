@@ -3,6 +3,7 @@ package facade;
 import chess.*;
 import model.GameData;
 import webSocketMessages.userCommands.*;
+import websocket.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ import java.util.List;
 
 
 
-public class ChessClient {
+public class ChessClient implements DisplayHandler {
 
     private State userState;
     private String authToken;
