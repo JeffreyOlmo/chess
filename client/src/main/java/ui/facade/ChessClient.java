@@ -27,11 +27,29 @@ public class ChessClient implements DisplayHandler {
     }
 
     public String eval(String input) {
+        String output = "Error with command. Try: Help";
+        try {
+            String lowerCaseInput = input.toLowerCase();
+            String[] inputTokens = lowerCaseInput.split(" ");
+            if (inputTokens.length == 0) {
+                inputTokens = new String[]{"Help"};
+            }
 
+            String[] methodParams = Arrays.copyOfRange(inputTokens, 1, inputTokens.length);
+            try {
+                output = (String) getClass().getDeclaredMethod(inputTokens[0], String[].class).invoke(this, (Object) methodParams);
+            } catch (NoSuchMethodException e) {
+                output = String.format("Unknown command\n%s", help(methodParams));
+            }
+        } catch (Throwable e) {
+            Throwable rootCause = ExceptionUtil.getRoot(e);
+            output = String.format("Error: %s", rootCause.getMessage());
+        }
+        return output;
     }
 
     public void clear() throws Exception {
-
+        server.clear();
     }
 
     private String clear(String[] ignored) throws Exception {
@@ -69,7 +87,22 @@ public class ChessClient implements DisplayHandler {
 
 
     private String join(String[] params) throws Exception {
+        verifyAuth();
+        if (userState == State.LOGGED_IN) {
+            if (params.length == 2 && ("WHITE".equalsIgnoreCase(params[1]) || "BLACK".equalsIgnoreCase(params[1]))) {
+                int selectedGameIndex = Integer.parseInt(params[0]);
+                if (games != null && selectedGameIndex >= 0 && selectedGameIndex < games.length) {
+                    int selectedGameID = games[selectedGameIndex].gameID();
+                    ChessGame.TeamColor selectedColor = ChessGame.TeamColor.valueOf(params[1].toUpperCase());
+                    gameData = server.joinGame(authToken, selectedGameID, selectedColor);
+                    userState = (selectedColor == ChessGame.TeamColor.WHITE ? State.WHITE : State.BLACK);
+                    webSocket.sendCommand(new JoinPlayerCommand(authToken, selectedGameID, selectedColor));
+                    return String.format("Joined %d as %s", gameData.gameID(), selectedColor);
+                }
+            }
+        }
 
+        return "Failure";
     }
 
 
@@ -82,7 +115,19 @@ public class ChessClient implements DisplayHandler {
     }
 
     private String legal(String[] params) throws Exception {
-
+        verifyAuth();
+        if (isPlaying() || isObserving()) {
+            if (params.length == 1) {
+                ChessPosition selectedPosition = new ChessPosition(params[0]);
+                ArrayList<ChessPosition> highlightedPositions = new ArrayList<>();
+                highlightedPositions.add(selectedPosition);
+                gameData.game().validMoves(selectedPosition).forEach(move -> highlightedPositions.add(move.getEndPosition()));
+                ChessGame.TeamColor currentColor = (userState == State.BLACK) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+                printGame(currentColor, highlightedPositions);
+                return "";
+            }
+        }
+        return "Failure";
     }
 
     private String move(String[] params) throws Exception {
