@@ -1,3 +1,5 @@
+package java.client;
+
 import chess.ChessGame;
 import facade.ServerFacade;
 import model.AuthData;
@@ -5,7 +7,6 @@ import model.GameData;
 import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
 import server.Server;
-import facade.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,12 +36,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testClear_Success() throws ResponseException {
+    public void testClear_Success() throws facade.ResponseException {
         serverFacade.clear();
     }
 
     @Test
-    public void testRegister_Success() throws ResponseException {
+    public void testRegister_Success() throws facade.ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
@@ -56,7 +57,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogin_Success() throws ResponseException {
+    public void testLogin_Success() throws facade.ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
@@ -78,11 +79,11 @@ public class ServerFacadeTests {
         String email = "test@example.com";
 
         // Act and Assert
-        assertThrows(ResponseException.class, () -> serverFacade.register(username, password, email));
+        assertThrows(facade.ResponseException.class, () -> serverFacade.register(username, password, email));
     }
 
     @Test
-    public void testLogout_Success() throws ResponseException {
+    public void testLogout_Success() throws facade.ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
@@ -93,7 +94,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testCreateGame_Success() throws ResponseException {
+    public void testCreateGame_Success() throws facade.ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
@@ -117,11 +118,11 @@ public class ServerFacadeTests {
         String invalidAuthToken = "invalid_token";
 
         // Act and Assert
-        assertThrows(ResponseException.class, () -> serverFacade.createGame(invalidAuthToken, gameName));
+        assertThrows(facade.ResponseException.class, () -> serverFacade.createGame(invalidAuthToken, gameName));
     }
 
     @Test
-    public void testListGames_Success() throws ResponseException {
+    public void testListGames_Success() throws facade.ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
@@ -142,11 +143,11 @@ public class ServerFacadeTests {
         String invalidAuthToken = "invalid_token";
 
         // Act and Assert
-        assertThrows(ResponseException.class, () -> serverFacade.listGames(invalidAuthToken));
+        assertThrows(facade.ResponseException.class, () -> serverFacade.listGames(invalidAuthToken));
     }
 
     @Test
-    public void testJoinGame_Success() throws ResponseException {
+    public void testJoinGame_Success() throws facade.ResponseException {
         // Arrange
         String username = "testuser1";
         String password = "testpassword1";
@@ -174,11 +175,11 @@ public class ServerFacadeTests {
         int gameID = 123; // Arbitrary game ID
 
         // Act and Assert
-        assertThrows(ResponseException.class, () -> serverFacade.joinGame(invalidAuthToken, gameID, ChessGame.TeamColor.WHITE));
+        assertThrows(facade.ResponseException.class, () -> serverFacade.joinGame(invalidAuthToken, gameID, ChessGame.TeamColor.WHITE));
     }
 
     @Test
-    public void testJoinGame_InvalidGameID_ThrowsResponseException() throws ResponseException {
+    public void testJoinGame_InvalidGameID_ThrowsResponseException() throws facade.ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
@@ -187,7 +188,7 @@ public class ServerFacadeTests {
         int invalidGameID = -1; // Invalid game ID
 
         // Act and Assert
-        assertThrows(ResponseException.class, () -> serverFacade.joinGame(authToken, invalidGameID, ChessGame.TeamColor.WHITE));
+        assertThrows(facade.ResponseException.class, () -> serverFacade.joinGame(authToken, invalidGameID, ChessGame.TeamColor.WHITE));
     }
 
     private String hashPassword(String password) {
