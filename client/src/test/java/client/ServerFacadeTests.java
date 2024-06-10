@@ -37,15 +37,15 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testClear_Success() throws ResponseException {
+    public void testClearSuccess() throws ResponseException {
         serverFacade.clear();
     }
 
     @Test
-    public void testRegister_Success() throws ResponseException {
+    public void testRegisterSuccess() throws ResponseException {
         // Arrange
-        String username = "testuser";
-        String password = "testpassword";
+        String username = "testuser7";
+        String password = "testpassword7";
         String email = "test@example.com";
 
         // Act
@@ -58,7 +58,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogin_Success() throws ResponseException {
+    public void testLoginSuccess() throws ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
@@ -73,7 +73,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testRegister_InvalidInput_ThrowsResponseException() {
+    public void testRegisterInvalidInputThrowsResponseException() {
         // Arrange
         String username = ""; // Empty username
         String password = "testpassword";
@@ -84,10 +84,11 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogout_Success() throws ResponseException {
+    public void testLogoutSuccess() throws ResponseException {
         // Arrange
-        String username = "testuser";
-        String password = "testpassword";
+        String username = "testuser5";
+        String password = "testpassword5";
+        serverFacade.register(username, password, "");
         AuthData authData = serverFacade.login(username, password);
         String authToken = authData.getAuthToken();
 
@@ -113,7 +114,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testCreateGame_InvalidAuthToken_ThrowsResponseException() {
+    public void testCreateGameInvalidAuthTokenThrowsResponseException() {
         // Arrange
         String gameName = "Test Game";
         String invalidAuthToken = "invalid_token";
@@ -123,10 +124,11 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testListGames_Success() throws ResponseException {
+    public void testListGamesSuccess() throws ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
+        serverFacade.register(username, password, "");
         AuthData authData = serverFacade.login(username, password);
         String authToken = authData.getAuthToken();
 
@@ -139,7 +141,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testListGames_InvalidAuthToken_ThrowsResponseException() {
+    public void testListGamesInvalidAuthTokenThrowsResponseException() {
         // Arrange
         String invalidAuthToken = "invalid_token";
 
@@ -148,11 +150,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testJoinGame_Success() throws ResponseException {
+    public void testJoinGameSuccess() throws ResponseException {
         // Arrange
-        String username = "testuser1";
-        String password = "testpassword1";
-        String gameName = "Test Game";
+        String username = "testuser6";
+        String password = "testpassword6";
+        String gameName = "Test Game2";
+        serverFacade.register(username, password, "");
         AuthData authData = serverFacade.login(username, password);
         String authToken = authData.getAuthToken();
         GameData gameData = serverFacade.createGame(authToken, gameName);
@@ -170,7 +173,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testJoinGame_InvalidAuthToken_ThrowsResponseException() {
+    public void testJoinGameInvalidAuthTokenThrowsResponseException() {
         // Arrange
         String invalidAuthToken = "invalid_token";
         int gameID = 123; // Arbitrary game ID
@@ -180,7 +183,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testJoinGame_InvalidGameID_ThrowsResponseException() throws ResponseException {
+    public void testJoinGameInvalidGameIDThrowsResponseException() throws ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";
@@ -190,10 +193,6 @@ public class ServerFacadeTests {
 
         // Act and Assert
         assertThrows(ResponseException.class, () -> serverFacade.joinGame(authToken, invalidGameID, ChessGame.TeamColor.WHITE));
-    }
-
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
 }

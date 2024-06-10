@@ -2,7 +2,7 @@ package ui.facade;
 
 import chess.*;
 import model.GameData;
-import webSocketMessages.userCommands.*;
+import websocketmessages.usercommands.*;
 import ui.websocket.WebSocketFacade;
 
 import java.util.ArrayList;
@@ -71,10 +71,10 @@ public class ChessClient implements DisplayHandler {
 
     private String help(String[] ignored) {
         return switch (userState) {
-            case LOGGED_IN -> getHelp(loggedInHelpEntries);
-            case OBSERVING -> getHelp(observingHelpEntries);
-            case BLACK, WHITE -> getHelp(playingHelpEntries);
-            default -> getHelp(loggedOutHelpEntries);
+            case LOGGED_IN -> getHelp(LOGGED_IN_HELP_ENTRIES);
+            case OBSERVING -> getHelp(OBSERVING_HELP_ENTRIES);
+            case BLACK, WHITE -> getHelp(PLAYING_HELP_ENTRIES);
+            default -> getHelp(LOGGED_OUT_HELP_ENTRIES);
         };
     }
 
@@ -298,14 +298,14 @@ public class ChessClient implements DisplayHandler {
     private record Help(String cmd, String description) {
     }
 
-    static final List<HelpEntry> loggedOutHelpEntries = Arrays.asList(
+    static final List<HelpEntry> LOGGED_OUT_HELP_ENTRIES = Arrays.asList(
             new HelpEntry("register <USERNAME> <PASSWORD> <EMAIL>", "create a new user account"),
             new HelpEntry("login <USERNAME> <PASSWORD>", "authenticate and start playing"),
             new HelpEntry("quit", "exit the application"),
             new HelpEntry("help", "display list of available commands")
     );
 
-    static final List<HelpEntry> loggedInHelpEntries = Arrays.asList(
+    static final List<HelpEntry> LOGGED_IN_HELP_ENTRIES = Arrays.asList(
             new HelpEntry("create <NAME>", "initiate a new game session"),
             new HelpEntry("list", "view a list of available games"),
             new HelpEntry("join <ID> [WHITE|BLACK]", "participate in an existing game"),
@@ -315,7 +315,7 @@ public class ChessClient implements DisplayHandler {
             new HelpEntry("help", "display list of available commands")
     );
 
-    static final List<HelpEntry> observingHelpEntries = Arrays.asList(
+    static final List<HelpEntry> OBSERVING_HELP_ENTRIES = Arrays.asList(
             new HelpEntry("legal", "show legal moves for the current board position"),
             new HelpEntry("redraw", "refresh the board display"),
             new HelpEntry("leave", "stop observing the game"),
@@ -323,7 +323,7 @@ public class ChessClient implements DisplayHandler {
             new HelpEntry("help", "display list of available commands")
     );
 
-    static final List<HelpEntry> playingHelpEntries = Arrays.asList(
+    static final List<HelpEntry> PLAYING_HELP_ENTRIES = Arrays.asList(
             new HelpEntry("redraw", "refresh the board display"),
             new HelpEntry("leave", "forfeit and exit the game"),
             new HelpEntry("move <crcr> [q|r|b|n]", "make a move and optionally promote a pawn"),

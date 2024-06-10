@@ -1,4 +1,4 @@
-package webSocketMessages.serverMessages;
+package websocketmessages.servermessages;
 
 import model.GameData;
 

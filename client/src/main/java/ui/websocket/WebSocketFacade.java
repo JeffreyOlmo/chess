@@ -2,11 +2,11 @@ package ui.websocket;
 
 import com.google.gson.Gson;
 import ui.facade.DisplayHandler;
-import webSocketMessages.serverMessages.ErrorMessage;
-import webSocketMessages.serverMessages.LoadMessage;
-import webSocketMessages.serverMessages.NotificationMessage;
-import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.GameCommand;
+import websocketmessages.servermessages.ErrorMessage;
+import websocketmessages.servermessages.LoadMessage;
+import websocketmessages.servermessages.NotificationMessage;
+import websocketmessages.servermessages.ServerMessage;
+import websocketmessages.usercommands.GameCommand;
 
 import javax.websocket.*;
 import java.io.IOException;

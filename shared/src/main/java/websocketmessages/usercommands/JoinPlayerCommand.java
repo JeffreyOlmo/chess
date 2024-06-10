@@ -1,8 +1,8 @@
-package webSocketMessages.userCommands;
+package websocketmessages.usercommands;
 
 import chess.ChessGame;
 
-import static webSocketMessages.userCommands.UserGameCommand.CommandType.JOIN_PLAYER;
+import static websocketmessages.usercommands.UserGameCommand.CommandType.JOIN_PLAYER;
 
 public class JoinPlayerCommand extends GameCommand {
     public final ChessGame.TeamColor playerColor;

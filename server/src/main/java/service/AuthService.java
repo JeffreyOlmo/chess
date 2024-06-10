@@ -24,6 +24,8 @@ public class AuthService {
         try {
             UserData loggedInUser = dataAccess.readUser(user.getUsername());
             System.out.println((loggedInUser != null && BCrypt.checkpw(user.getPassword(), loggedInUser.getPassword())));
+            System.out.println(user.getPassword());
+            System.out.println(loggedInUser == null);
             if (loggedInUser != null && BCrypt.checkpw(user.getPassword(), loggedInUser.getPassword())) {
                 return dataAccess.writeAuth(loggedInUser.getUsername());
             }

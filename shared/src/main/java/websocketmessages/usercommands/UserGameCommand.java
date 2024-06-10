@@ -1,4 +1,4 @@
-package webSocketMessages.userCommands;
+package websocketmessages.usercommands;
 
 import java.util.Objects;
 
