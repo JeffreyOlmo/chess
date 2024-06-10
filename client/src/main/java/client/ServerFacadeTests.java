@@ -3,6 +3,7 @@ import facade.ServerFacade;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
+import org.mindrot.jbcrypt.BCrypt;
 import server.Server;
 import facade.*;
 
@@ -152,8 +153,8 @@ public class ServerFacadeTests {
     @Test
     public void testJoinGame_Success() throws ResponseException {
         // Arrange
-        String username = "testuser";
-        String password = "testpassword";
+        String username = "testuser1";
+        String password = "testpassword1";
         String gameName = "Test Game";
         AuthData authData = serverFacade.login(username, password);
         String authToken = authData.getAuthToken();
@@ -192,6 +193,10 @@ public class ServerFacadeTests {
 
         // Act and Assert
         assertThrows(ResponseException.class, () -> serverFacade.joinGame(authToken, invalidGameID, ChessGame.TeamColor.WHITE));
+    }
+
+    private String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
 }
