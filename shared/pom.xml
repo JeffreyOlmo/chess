@@ -53,7 +53,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        Main
+                                        MainProgram
                                     </mainClass>
                                 </manifest>
                             </archive>

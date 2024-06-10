@@ -96,7 +96,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testCreateGame_Success() throws ResponseException {
+    public void testCreateGameSuccess() throws ResponseException {
         // Arrange
         String username = "testuser";
         String password = "testpassword";

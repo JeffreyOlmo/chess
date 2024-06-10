@@ -62,7 +62,7 @@ public class ChessClient implements DisplayHandler {
         server.clear();
     }
 
-    private String clear(String[] ignored) throws Exception {
+    public String clear(String[] ignored) throws Exception {
         clear();
         userState = State.LOGGED_OUT;
         gameData = null;
@@ -78,12 +78,12 @@ public class ChessClient implements DisplayHandler {
         };
     }
 
-    private String quit(String[] ignored) {
+    public String quit(String[] ignored) {
         return "quit";
     }
 
 
-    private String login(String[] params) throws ResponseException {
+    public String login(String[] params) throws ResponseException {
         if (userState == State.LOGGED_OUT && params.length == 2) {
             var response = server.login(params[0], params[1]);
             authToken = response.getAuthToken();
@@ -93,7 +93,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String register(String[] params) throws ResponseException {
+    public String register(String[] params) throws ResponseException {
         if (userState == State.LOGGED_OUT && params.length == 3) {
             var response = server.register(params[0], params[1], params[2]);
             authToken = response.getAuthToken();
@@ -103,7 +103,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String logout(String[] ignore) throws ResponseException {
+    public String logout(String[] ignore) throws ResponseException {
         verifyAuth();
 
         if (userState != State.LOGGED_OUT) {
@@ -115,7 +115,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String create(String[] params) throws ResponseException {
+    public String create(String[] params) throws ResponseException {
         verifyAuth();
 
         if (params.length == 1 && userState == State.LOGGED_IN) {
@@ -125,7 +125,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String list(String[] ignore) throws ResponseException {
+    public String list(String[] ignore) throws ResponseException {
         verifyAuth();
         games = server.listGames(authToken);
         StringBuilder buf = new StringBuilder();
@@ -138,7 +138,7 @@ public class ChessClient implements DisplayHandler {
     }
 
 
-    private String join(String[] params) throws Exception {
+    public String join(String[] params) throws Exception {
         verifyAuth();
         if (userState == State.LOGGED_IN) {
             if (params.length == 2 && ("WHITE".equalsIgnoreCase(params[1]) || "BLACK".equalsIgnoreCase(params[1]))) {
@@ -158,7 +158,7 @@ public class ChessClient implements DisplayHandler {
     }
 
 
-    private String observe(String[] params) throws Exception {
+    public String observe(String[] params) throws Exception {
         verifyAuth();
         if (State.LOGGED_IN == userState) {
             if (1 == params.length) {
@@ -174,7 +174,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String redraw(String[] ignored) throws Exception {
+    public String redraw(String[] ignored) throws Exception {
         verifyAuth();
         if (isPlaying() || isObserving()) {
             printGame();
@@ -183,7 +183,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String legal(String[] params) throws Exception {
+    public String legal(String[] params) throws Exception {
         verifyAuth();
         if (isPlaying() || isObserving()) {
             if (params.length == 1) {
@@ -199,7 +199,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String move(String[] params) throws Exception {
+    public String move(String[] params) throws Exception {
         verifyAuth();
         if (params.length == 1) {
             var move = new ChessMove(params[0]);
@@ -211,7 +211,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String leave(String[] ignored) throws Exception {
+    public String leave(String[] ignored) throws Exception {
         if (isPlaying() || isObserving()) {
             userState = State.LOGGED_IN;
             webSocket.sendCommand(new GameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameData.getGameID()));
@@ -221,7 +221,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    private String resign(String[] ignored) throws Exception {
+    public String resign(String[] ignored) throws Exception {
         if (isPlaying()) {
             webSocket.sendCommand(new GameCommand(GameCommand.CommandType.RESIGN, authToken, gameData.getGameID()));
             userState = State.LOGGED_IN;
@@ -293,9 +293,6 @@ public class ChessClient implements DisplayHandler {
             this.command = cmd;
             this.description = desc;
         }
-    }
-
-    private record Help(String cmd, String description) {
     }
 
     static final List<HelpEntry> LOGGED_OUT_HELP_ENTRIES = Arrays.asList(
