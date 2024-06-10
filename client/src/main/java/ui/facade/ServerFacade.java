@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 import server.JoinRequest;
 
 
@@ -74,10 +73,6 @@ public class ServerFacade {
             }
         }
         throw new ResponseException(404, "Missing game");
-    }
-
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     private <T> T makeRequest(String method, String path, Object request, String authToken, Class<T> clazz) throws ResponseException {
