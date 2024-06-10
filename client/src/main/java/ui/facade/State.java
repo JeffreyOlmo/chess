@@ -1,4 +1,4 @@
-package facade;
+package ui.facade;
 
 import chess.ChessGame;
 

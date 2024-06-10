@@ -1,7 +1,7 @@
-package websocket;
+package ui.websocket;
 
 import com.google.gson.Gson;
-import facade.DisplayHandler;
+import ui.facade.DisplayHandler;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadMessage;
 import webSocketMessages.serverMessages.NotificationMessage;

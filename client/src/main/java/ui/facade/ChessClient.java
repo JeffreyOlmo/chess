@@ -1,9 +1,9 @@
-package facade;
+package ui.facade;
 
 import chess.*;
 import model.GameData;
 import webSocketMessages.userCommands.*;
-import websocket.WebSocketFacade;
+import ui.websocket.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;

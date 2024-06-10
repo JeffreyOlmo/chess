@@ -1,4 +1,4 @@
-package facade;
+package ui.facade;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
