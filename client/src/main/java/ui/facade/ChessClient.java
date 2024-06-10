@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static ui.EscapeSequences.*;
 
 
 public class ChessClient implements DisplayHandler {
@@ -25,6 +26,16 @@ public class ChessClient implements DisplayHandler {
     public ChessClient(String hostname) throws Exception {
 
     }
+    public boolean isObserving() {
+        return (gameData != null && (userState == State.OBSERVING));
+    }
+    public boolean isGameOver() {
+        return (gameData != null && gameData.isGameOver());
+    }
+    public boolean isTurn() {
+        return (isPlaying() && userState.isTurn(gameData.getGame().getTeamTurn()));
+    }
+
 
     public String eval(String input) {
         String output = "Error with command. Try: Help";
@@ -113,7 +124,7 @@ public class ChessClient implements DisplayHandler {
         StringBuilder buf = new StringBuilder();
         for (var i = 0; i < games.length; i++) {
             var game = games[i];
-            var gameText = String.format("%d. %s white:%s black:%s state: %s%n", i, game.gameName(), game.whiteUsername(), game.blackUsername(), game.state());
+            var gameText = String.format("%d. %s white:%s black:%s state: %s%n", i, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername(), game.getState());
             buf.append(gameText);
         }
         return buf.toString();
@@ -126,12 +137,12 @@ public class ChessClient implements DisplayHandler {
             if (params.length == 2 && ("WHITE".equalsIgnoreCase(params[1]) || "BLACK".equalsIgnoreCase(params[1]))) {
                 int selectedGameIndex = Integer.parseInt(params[0]);
                 if (games != null && selectedGameIndex >= 0 && selectedGameIndex < games.length) {
-                    int selectedGameID = games[selectedGameIndex].gameID();
+                    int selectedGameID = games[selectedGameIndex].getGameID();
                     ChessGame.TeamColor selectedColor = ChessGame.TeamColor.valueOf(params[1].toUpperCase());
                     gameData = server.joinGame(authToken, selectedGameID, selectedColor);
                     userState = (selectedColor == ChessGame.TeamColor.WHITE ? State.WHITE : State.BLACK);
                     webSocket.sendCommand(new JoinPlayerCommand(authToken, selectedGameID, selectedColor));
-                    return String.format("Joined %d as %s", gameData.gameID(), selectedColor);
+                    return String.format("Joined %d as %s", gameData.getGameID(), selectedColor);
                 }
             }
         }
@@ -172,7 +183,7 @@ public class ChessClient implements DisplayHandler {
                 ChessPosition selectedPosition = new ChessPosition(params[0]);
                 ArrayList<ChessPosition> highlightedPositions = new ArrayList<>();
                 highlightedPositions.add(selectedPosition);
-                gameData.game().validMoves(selectedPosition).forEach(move -> highlightedPositions.add(move.getEndPosition()));
+                gameData.getGame().validMoves(selectedPosition).forEach(move -> highlightedPositions.add(move.getEndPosition()));
                 ChessGame.TeamColor currentColor = (userState == State.BLACK) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
                 printGame(currentColor, highlightedPositions);
                 return "";
@@ -186,7 +197,7 @@ public class ChessClient implements DisplayHandler {
         if (params.length == 1) {
             var move = new ChessMove(params[0]);
             if (isMoveLegal(move)) {
-                webSocket.sendCommand(new MoveCommand(authToken, gameData.gameID(), move));
+                webSocket.sendCommand(new MoveCommand(authToken, gameData.getGameID(), move));
                 return "Success";
             }
         }
@@ -196,7 +207,7 @@ public class ChessClient implements DisplayHandler {
     private String leave(String[] ignored) throws Exception {
         if (isPlaying() || isObserving()) {
             userState = State.LOGGED_IN;
-            webSocket.sendCommand(new GameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameData.gameID()));
+            webSocket.sendCommand(new GameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameData.getGameID()));
             gameData = null;
             return "Left game";
         }
@@ -205,7 +216,7 @@ public class ChessClient implements DisplayHandler {
 
     private String resign(String[] ignored) throws Exception {
         if (isPlaying()) {
-            webSocket.sendCommand(new GameCommand(GameCommand.CommandType.RESIGN, authToken, gameData.gameID()));
+            webSocket.sendCommand(new GameCommand(GameCommand.CommandType.RESIGN, authToken, gameData.getGameID()));
             userState = State.LOGGED_IN;
             gameData = null;
             return "Resigned";
@@ -225,23 +236,63 @@ public class ChessClient implements DisplayHandler {
     }
 
     public void printPrompt() {
-
+        String gameState = "Not playing";
+        if (gameData != null) {
+            gameState = switch (gameData.getState()) {
+                case UNDECIDED -> String.format("%s's turn", gameData.getGame().getTeamTurn());
+                case DRAW -> "Draw";
+                case BLACK -> "Black won";
+                case WHITE -> "White Won";
+            };
+        }
+        System.out.print(RESET_TEXT_COLOR + String.format("\n[%s: %s] >>> ", userState, gameState) + SET_TEXT_COLOR_GREEN);
     }
 
     public boolean isMoveLegal(ChessMove move) {
-
+        if (isTurn()) {
+            var board = gameData.getGame().getBoard();
+            var piece = board.getPiece(move.getStartPosition());
+            if (piece != null) {
+                var validMoves = piece.pieceMoves(board, move.getStartPosition());
+                if (validMoves.contains(move)) {
+                    return gameData.getGame().validMoves(move.getStartPosition()).contains(move);
+                }
+            }
+        }
+        return false;
     }
 
     public boolean isPlaying() {
-
+        return (gameData != null && (userState == State.WHITE || userState == State.BLACK) && !isGameOver());
     }
 
     private String getHelp(List<Help> help) {
+        StringBuilder sb = new StringBuilder();
+        for (var me : help) {
+            sb.append(String.format("  %s%s%s - %s%s%s%n", SET_TEXT_COLOR_BLUE, me.cmd, RESET_TEXT_COLOR, SET_TEXT_COLOR_MAGENTA, me.description, RESET_TEXT_COLOR));
+        }
+        return sb.toString();
 
     }
 
     private void verifyAuth() throws ResponseException {
+        if (authToken == null) {
+            throw new ResponseException(401, "Please login or register");
+        }
+    }
 
+    public boolean isMoveLegal(ChessMove move) {
+        if (isTurn()) {
+            var board = gameData.game().getBoard();
+            var piece = board.getPosition(move.getStartPosition());
+            if (piece != null) {
+                var validMoves = piece.pieceMoves(board, move.getStartPosition());
+                if (validMoves.contains(move)) {
+                    return board.isMoveLegal(move);
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -256,6 +307,9 @@ public class ChessClient implements DisplayHandler {
             this.command = cmd;
             this.description = desc;
         }
+    }
+
+    private record Help(String cmd, String description) {
     }
 
     static final List<HelpEntry> loggedOutHelpEntries = Arrays.asList(
@@ -292,5 +346,33 @@ public class ChessClient implements DisplayHandler {
             new HelpEntry("quit", "exit the application"),
             new HelpEntry("help", "display list of available commands")
     );
+
+    @Override
+    public void updateBoard(GameData newGameData) {
+        gameData = newGameData;
+        printGame();
+        printPrompt();
+
+        if (isGameOver()) {
+            userState = State.LOGGED_IN;
+            printPrompt();
+            gameData = null;
+        }
+    }
+
+    @Override
+    public void message(String message) {
+        System.out.println();
+        System.out.println(SET_TEXT_COLOR_MAGENTA + "NOTIFY: " + message);
+        printPrompt();
+    }
+
+    @Override
+    public void error(String message) {
+        System.out.println();
+        System.out.println(SET_TEXT_COLOR_RED + "NOTIFY: " + message);
+        printPrompt();
+
+    }
 
 }
