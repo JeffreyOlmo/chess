@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import model.UserData;
 import server.JoinRequest;
 
 
@@ -38,8 +39,8 @@ public class ServerFacade {
     }
 
     public AuthData login(String username, String password) throws ResponseException {
-        var request = Map.of("username", username, "password", password);
-        return this.makeRequest("POST", "/session", request, null, AuthData.class);
+        var userData = new UserData(username, password, ""); // Provide an empty string for the email field
+        return this.makeRequest("POST", "/session", userData, null, AuthData.class);
     }
 
     public void logout(String authToken) throws ResponseException {
