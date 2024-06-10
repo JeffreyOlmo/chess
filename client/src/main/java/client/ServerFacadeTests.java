@@ -89,12 +89,7 @@ public class ServerFacadeTests {
         AuthData authData = serverFacade.login(username, password);
         String authToken = authData.getAuthToken();
 
-        // Act
         serverFacade.logout(authToken);
-
-        // Assert
-        // No specific assertions needed, as the method doesn't return anything
-        // If no exception is thrown, the test passes
     }
 
     @Test
