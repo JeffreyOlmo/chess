@@ -24,6 +24,8 @@ public class ChessClient implements DisplayHandler {
 
 
     public ChessClient(String hostname) throws Exception {
+        server = new ServerFacade(hostname);
+        webSocket = new WebSocketFacade(hostname, this);
 
     }
     public boolean isObserving() {
@@ -68,7 +70,12 @@ public class ChessClient implements DisplayHandler {
     }
 
     private String help(String[] ignored) {
-
+        return switch (userState) {
+            case LOGGED_IN -> getHelp(loggedInHelpEntries);
+            case OBSERVING -> getHelp(observingHelpEntries);
+            case BLACK, WHITE -> getHelp(playingHelpEntries);
+            default -> getHelp(loggedOutHelpEntries);
+        };
     }
 
     private String quit(String[] ignored) {
@@ -266,33 +273,12 @@ public class ChessClient implements DisplayHandler {
         return (gameData != null && (userState == State.WHITE || userState == State.BLACK) && !isGameOver());
     }
 
-    private String getHelp(List<Help> help) {
-        StringBuilder sb = new StringBuilder();
-        for (var me : help) {
-            sb.append(String.format("  %s%s%s - %s%s%s%n", SET_TEXT_COLOR_BLUE, me.cmd, RESET_TEXT_COLOR, SET_TEXT_COLOR_MAGENTA, me.description, RESET_TEXT_COLOR));
-        }
-        return sb.toString();
 
-    }
 
     private void verifyAuth() throws ResponseException {
         if (authToken == null) {
             throw new ResponseException(401, "Please login or register");
         }
-    }
-
-    public boolean isMoveLegal(ChessMove move) {
-        if (isTurn()) {
-            var board = gameData.game().getBoard();
-            var piece = board.getPosition(move.getStartPosition());
-            if (piece != null) {
-                var validMoves = piece.pieceMoves(board, move.getStartPosition());
-                if (validMoves.contains(move)) {
-                    return board.isMoveLegal(move);
-                }
-            }
-        }
-        return false;
     }
 
 
@@ -346,6 +332,14 @@ public class ChessClient implements DisplayHandler {
             new HelpEntry("quit", "exit the application"),
             new HelpEntry("help", "display list of available commands")
     );
+
+    private String getHelp(List<HelpEntry> help) {
+        StringBuilder sb = new StringBuilder();
+        for (var me : help) {
+            sb.append(String.format("  %s%s%s - %s%s%s%n", SET_TEXT_COLOR_BLUE, me.command, RESET_TEXT_COLOR, SET_TEXT_COLOR_MAGENTA, me.description, RESET_TEXT_COLOR));
+        }
+        return sb.toString();
+    }
 
     @Override
     public void updateBoard(GameData newGameData) {
