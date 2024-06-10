@@ -5,8 +5,6 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import server.JoinRequest;
-
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -60,7 +58,7 @@ public class ServerFacade {
     }
 
     public GameData joinGame(String authToken, int gameID, ChessGame.TeamColor color) throws ResponseException {
-        var request = new JoinRequest(color, gameID);
+        var request = new JoinRequestData(color, gameID);
         this.makeRequest("PUT", "/game", request, authToken, GameData.class);
         return getGame(authToken, gameID);
     }
