@@ -13,14 +13,16 @@ import java.util.logging.Logger;
 
 
 public class Server {
-    DataAccess dataAccess;
-    UserService userService;
-    GameService gameService;
-    AdminService adminService;
-    AuthService authService;
+    private DataAccess dataAccess;
+    private UserService userService;
+    private GameService gameService;
+    private AdminService adminService;
+    private AuthService authService;
     public static final Logger LOG = Logger.getLogger("chess");
+
     public Server() {
     }
+
     public int run(int desiredPort) {
         try {
             initializeServices();
@@ -42,7 +44,9 @@ public class Server {
     }
 
     private void configureSpark(int desiredPort) {
+        WebSocketHandler webSocketHandler = new WebSocketHandler(dataAccess);
         Spark.port(desiredPort);
+        Spark.webSocket("/connect", webSocketHandler);
 
         var webDir = Paths.get(Server.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "web");
         Spark.externalStaticFileLocation(webDir.toString());
@@ -70,6 +74,7 @@ public class Server {
     public void stop() {
         Spark.stop();
     }
+
     public Object errorHandler(CodedException e, Request req, Response res) {
         var body = new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false));
         res.type("application/json");
@@ -77,69 +82,47 @@ public class Server {
         res.status(e.statusCode());
         return body;
     }
+
     private void log(Request req, Response res) {
         LOG.info(String.format("[%s] %s - %s", req.requestMethod(), req.pathInfo(), res.status()));
     }
-    /**
-     * Endpoint for [DELETE] /db
-     */
+
     public Object clearApplication(Request ignoreReq, Response res) throws CodedException {
         adminService.clearApplication();
         return send();
     }
-    /**
-     * Endpoint for [POST] /user - Register user
-     * <pre>{ "username":"", "password":"", "email":"" }</pre>
-     */
+
     private Object registerUser(Request req, Response ignore) throws CodedException {
         var user = getBody(req, UserData.class);
         var authToken = userService.registerUser(user);
         return send("username", user.getUsername(), "authToken", authToken.getAuthToken());
     }
 
-    /**
-     * Endpoint for [POST] /session
-     * <pre>{ "username":"", "password":"" }</pre>
-     */
     public Object login(Request req, Response ignore) throws CodedException {
         var user = getBody(req, UserData.class);
         var authData = authService.createSession(user);
         return send("username", user.getUsername(), "authToken", authData.getAuthToken());
     }
-    /**
-     * Endpoint for [DELETE] /session
-     * Authorization header required.
-     */
+
     public Object deleteSession(Request req, Response ignore) throws CodedException {
         var authData = throwIfUnauthorized(req);
         authService.deleteSession(authData.getAuthToken());
         return send();
     }
 
-    /**
-     * Endpoint for [GET] /game
-     * Authorization header required.
-     */
     public Object listGames(Request req, Response ignoreRes) throws CodedException {
         throwIfUnauthorized(req);
         var games = gameService.listGames();
         return send("games", games.toArray());
     }
-    /**
-     * Endpoint for [POST] / game
-     * Authorization header required.
-     */
+
     public Object createGame(Request req, Response ignoreRes) throws CodedException {
         throwIfUnauthorized(req);
         var gameData = getBody(req, GameData.class);
         gameData = gameService.createGame(gameData.getGameName());
         return send("gameID", gameData.getGameID());
     }
-    /**
-     * Endpoint for [PUT] /
-     * Authorization header required.
-     * <pre>{ "playerColor":"WHITE/BLACK/empty", "gameID": 1234 }</pre>
-     */
+
     public Object joinGame(Request req, Response ignoreRes) throws CodedException {
         var authData = throwIfUnauthorized(req);
         var joinReq = getBody(req, JoinRequest.class);
@@ -158,6 +141,7 @@ public class Server {
         }
         return body;
     }
+
     private String send(Object... props) {
         Map<Object, Object> map = new HashMap<>();
         for (var i = 0; i + 1 < props.length; i = i + 2) {
@@ -165,6 +149,7 @@ public class Server {
         }
         return new Gson().toJson(map);
     }
+
     private AuthData throwIfUnauthorized(Request req) throws CodedException {
         var authToken = req.headers("authorization");
         if (authToken != null) {

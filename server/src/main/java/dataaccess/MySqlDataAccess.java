@@ -122,14 +122,10 @@ public class MySqlDataAccess implements DataAccess {
 
     public GameData readGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            System.out.println("got here 1");
             try (var preparedStatement = conn.prepareStatement("SELECT gameID, gameName, whitePlayerName, blackPlayerName, game, state FROM `game` WHERE gameID=?")) {
-                System.out.println("got here 2");
                 preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
-                    System.out.println("got here 3");
                     if (rs.next()) {
-                        System.out.println(readGameData(rs));
                         return readGameData(rs);
                     }
                 }

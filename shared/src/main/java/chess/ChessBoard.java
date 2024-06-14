@@ -3,23 +3,41 @@ package chess;
 import java.util.*;
 
 public class ChessBoard {
-
-    public Map<ChessPosition, ChessPiece> board;
+    private Map<String, ChessPiece> board;
 
     public ChessBoard() {
         this.board = new HashMap<>();
-        //resetBoard();
+    }
+
+    public Map<String, ChessPiece> getBoard() {
+        return board;
+    }
+
+    public void setBoard(Map<String, ChessPiece> board) {
+        this.board = board;
     }
 
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board.put(position, piece);
+        board.put(position.toString(), piece); // Ensure ChessPosition has a toString method that returns the correct key format
     }
 
     public ChessPiece getPiece(ChessPosition position) {
-        return board.get(position);
+        return board.get(position.toString());
     }
 
     public void removePiece(ChessPosition position) {
+        board.remove(position.toString());
+    }
+
+    public void addPiece(String position, ChessPiece piece) {
+        board.put(position, piece);
+    }
+
+    public ChessPiece getPiece(String position) {
+        return board.get(position);
+    }
+
+    public void removePiece(String position) {
         board.remove(position);
     }
 
@@ -28,31 +46,31 @@ public class ChessBoard {
 
         // Setup pieces for WHITE
         for (int i = 1; i <= 8; i++) {
-            addPiece(new ChessPosition(2, i), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(2, i).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
         }
 
-        addPiece(new ChessPosition(1, 1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
-        addPiece(new ChessPosition(1, 2), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(1, 3), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(1, 4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN));
-        addPiece(new ChessPosition(1, 5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
-        addPiece(new ChessPosition(1, 6), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(1, 7), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(1, 8), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(1, 1).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(1, 2).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(1, 3).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(1, 4).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(1, 5).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(1, 6).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(1, 7).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(1, 8).toString(), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
 
         // Setup pieces for BLACK
         for (int i = 1; i <= 8; i++) {
-            addPiece(new ChessPosition(7, i), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7, i).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
 
-        addPiece(new ChessPosition(8, 1), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
-        addPiece(new ChessPosition(8, 2), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(8, 3), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(8, 4), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN));
-        addPiece(new ChessPosition(8, 5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
-        addPiece(new ChessPosition(8, 6), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(8, 7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(8, 8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(8, 1).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(8, 2).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(8, 3).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(8, 4).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(8, 5).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(8, 6).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(8, 7).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(8, 8).toString(), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
     }
 
     private static final int BLACK = 0;
@@ -94,10 +112,10 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return toString(ChessGame.TeamColor.WHITE, null);
+        return toStringhelper(ChessGame.TeamColor.WHITE, null) + "\n" + toStringhelper(ChessGame.TeamColor.BLACK, null);
     }
 
-    public String toString(ChessGame.TeamColor playerColor, Collection<ChessPosition> highlights) {
+    public String toStringhelper(ChessGame.TeamColor playerColor, Collection<ChessPosition> highlights) {
         var sb = new StringBuilder();
         var currentSquare = BOARD_WHITE;
         var rows = new int[]{7, 6, 5, 4, 3, 2, 1, 0};
@@ -117,7 +135,7 @@ public class ChessBoard {
                 if (highlights != null && highlights.contains(new ChessPosition(i + 1, j + 1))) {
                     squareColor = BOARD_HIGHLIGHT;
                 }
-                var piece = board.get(new ChessPosition(i + 1, j + 1));
+                var piece = board.get(new ChessPosition(i + 1, j + 1).toString());
                 if (piece != null) {
                     var color = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_PIECE : BLACK_PIECE;
                     var p = PIECE_MAP.get(piece.getPieceType());
@@ -146,6 +164,6 @@ public class ChessBoard {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(board);
+        return Objects.hash(board);
     }
 }

@@ -1,13 +1,19 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessGameDeserializer;
+import chess.ChessGameSerializer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import ui.facade.ResponseException;
 import ui.facade.ServerFacade;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
+import ui.facade.Response;
 import org.mindrot.jbcrypt.BCrypt;
 import server.Server;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,6 +22,11 @@ public class ServerFacadeTests {
 
     private static Server server;
     static ServerFacade serverFacade;
+    private final Gson defaultGson = new Gson();
+    private final Gson customGson = new GsonBuilder()
+            .registerTypeAdapter(ChessGame.class, new ChessGameSerializer())
+            .registerTypeAdapter(ChessGame.class, new ChessGameDeserializer())
+            .create();
 
     @BeforeAll
     public static void init() {
@@ -60,10 +71,11 @@ public class ServerFacadeTests {
     @Test
     public void testLoginSuccess() throws ResponseException {
         // Arrange
-        String username = "testuser";
-        String password = "testpassword";
+        String username = "testuser12";
+        String password = "testpassword12";
 
         // Act
+        serverFacade.register(username, password, "");
         AuthData authData = serverFacade.login(username, password);
 
         // Assert
@@ -101,6 +113,7 @@ public class ServerFacadeTests {
         String username = "testuser";
         String password = "testpassword";
         String gameName = "Test Game";
+        serverFacade.register(username, password, "");
         AuthData authData = serverFacade.login(username, password);
         String authToken = authData.getAuthToken();
 
@@ -126,19 +139,56 @@ public class ServerFacadeTests {
     @Test
     public void testListGamesSuccess() throws ResponseException {
         // Arrange
-        String username = "testuser";
-        String password = "testpassword";
+        String username = "testuser15";
+        String password = "testpassword15";
         serverFacade.register(username, password, "");
         AuthData authData = serverFacade.login(username, password);
         String authToken = authData.getAuthToken();
+        serverFacade.createGame(authToken, "TestGame");
+        serverFacade.createGame(authToken, "TestGame2");
 
         // Act
         GameData[] games = serverFacade.listGames(authToken);
+        System.out.println("Number of games returned: " + games.length);
 
         // Assert
-        assertNotNull(games);
-        // Add more assertions based on the expected behavior of listGames
+        assertNotNull(games, "Games array should not be null");
+        assertEquals(2, games.length, "Should return exactly two games");
+
+        // Further assertions to check detailed game data
+        // Check first game
+        GameData firstGame = games[0];
+        assertNotNull(firstGame, "First game should not be null");
+        assertEquals("TestGame", firstGame.getGameName(), "Game name should match");
+        assertNotNull(firstGame.getGame(), "Game object should not be null");
+        assertNotNull(firstGame.getGame().getBoard(), "Game board should not be null");
+        assertEquals(ChessGame.TeamColor.WHITE, firstGame.getGame().getTeamTurn(), "Team turn should be WHITE for the first game");
+
+        // Check second game
+        GameData secondGame = games[1];
+        assertNotNull(secondGame, "Second game should not be null");
+        assertEquals("TestGame2", secondGame.getGameName(), "Game name should match");
+        assertNotNull(secondGame.getGame(), "Game object should not be null");
+        assertNotNull(secondGame.getGame().getBoard(), "Game board should not be null");
+        assertEquals(ChessGame.TeamColor.WHITE, secondGame.getGame().getTeamTurn(), "Team turn should be WHITE for the second game");
+
+        // Output some detailed properties for debugging
+        System.out.println("First Game Details: " + firstGame.getGame().getBoard().toString());
+        System.out.println("Second Game Details: " + secondGame.getGame().getBoard().toString());
     }
+
+    @Test
+    public void testGsonDeserialization() {
+        String testJson = "{\"games\":[{\"gameID\":967,\"gameName\":\"TestGame\",\"game\":{\"board\":{\"board\":{\"21\":{\"pieceColor\":\"WHITE\",\"type\":\"PAWN\",\"hasMoved\":false},\"87\":{\"pieceColor\":\"BLACK\",\"type\":\"KNIGHT\",\"hasMoved\":false}}},\"teamTurn\":\"WHITE\"}}]}";
+        try {
+            Response response = customGson.fromJson(testJson, Response.class);
+            System.out.println("Number of games: " + (response.getGames() != null ? response.getGames().length : "null"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     @Test
     public void testListGamesInvalidAuthTokenThrowsResponseException() {
@@ -185,8 +235,9 @@ public class ServerFacadeTests {
     @Test
     public void testJoinGameInvalidGameIDThrowsResponseException() throws ResponseException {
         // Arrange
-        String username = "testuser";
-        String password = "testpassword";
+        String username = "testuser13";
+        String password = "testpassword13";
+        serverFacade.register(username, password, "");
         AuthData authData = serverFacade.login(username, password);
         String authToken = authData.getAuthToken();
         int invalidGameID = -1; // Invalid game ID

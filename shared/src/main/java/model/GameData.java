@@ -54,6 +54,10 @@ public class GameData {
         return state;
     }
 
+    public GameData setState(State state) {
+        return new GameData(this.gameID, this.whiteUsername, this.blackUsername, this.gameName, this.game, state);
+    }
+
     // Methods from original record
     public boolean isGameOver() {
         return state != State.UNDECIDED;

@@ -26,6 +26,7 @@ public class ChessClient implements DisplayHandler {
     public ChessClient(String hostname) throws Exception {
         server = new ServerFacade(hostname);
         webSocket = new WebSocketFacade(hostname, this);
+        userState = State.LOGGED_OUT;
 
     }
     public boolean isObserving() {
@@ -62,12 +63,12 @@ public class ChessClient implements DisplayHandler {
         server.clear();
     }
 
-    public String clear(String[] ignored) throws Exception {
-        clear();
-        userState = State.LOGGED_OUT;
-        gameData = null;
-        return "Cleared the world";
-    }
+//    public String clear(String[] ignored) throws Exception {
+//        clear();
+//        userState = State.LOGGED_OUT;
+//        gameData = null;
+//        return "Cleared the world";
+//    }
 
     private String help(String[] ignored) {
         return switch (userState) {
@@ -88,7 +89,8 @@ public class ChessClient implements DisplayHandler {
             var response = server.login(params[0], params[1]);
             authToken = response.getAuthToken();
             userState = State.LOGGED_IN;
-            return String.format("Logged in as %s", params[0]);
+            games = server.listGames(authToken); // Initialize games right after login
+            return String.format("Logged in as %s. Games loaded: %d", params[0], games.length);
         }
         return "Failure";
     }
@@ -141,6 +143,11 @@ public class ChessClient implements DisplayHandler {
     public String join(String[] params) throws Exception {
         verifyAuth();
         if (userState == State.LOGGED_IN) {
+            System.out.println("Logged in");
+
+            // Update the games list at the start of the join method
+            games = server.listGames(authToken);
+
             if (params.length == 2 && ("WHITE".equalsIgnoreCase(params[1]) || "BLACK".equalsIgnoreCase(params[1]))) {
                 int selectedGameIndex = Integer.parseInt(params[0]);
                 if (games != null && selectedGameIndex >= 0 && selectedGameIndex < games.length) {
@@ -156,6 +163,7 @@ public class ChessClient implements DisplayHandler {
 
         return "Failure";
     }
+
 
 
     public String observe(String[] params) throws Exception {
@@ -238,7 +246,7 @@ public class ChessClient implements DisplayHandler {
 
     private void printGame(ChessGame.TeamColor color, Collection<ChessPosition> highlights) {
         System.out.println("\n");
-        System.out.print((gameData.getGame().getBoard()).toString(color, highlights));
+        System.out.print((gameData.getGame().getBoard()).toString());
         System.out.println();
     }
 
@@ -285,57 +293,51 @@ public class ChessClient implements DisplayHandler {
     /**
      * All of all the possible client commands.
      */
-    private static class HelpEntry {
-        String command;
-        String description;
-
-        public HelpEntry(String cmd, String desc) {
-            this.command = cmd;
-            this.description = desc;
-        }
+    private record Help(String cmd, String description) {
     }
 
-    static final List<HelpEntry> LOGGED_OUT_HELP_ENTRIES = Arrays.asList(
-            new HelpEntry("register <USERNAME> <PASSWORD> <EMAIL>", "create a new user account"),
-            new HelpEntry("login <USERNAME> <PASSWORD>", "authenticate and start playing"),
-            new HelpEntry("quit", "exit the application"),
-            new HelpEntry("help", "display list of available commands")
+    static final List<Help> LOGGED_OUT_HELP_ENTRIES = List.of(
+            new Help("register <USERNAME> <PASSWORD> <EMAIL>", "to create an account"),
+            new Help("login <USERNAME> <PASSWORD>", "to play chess"),
+            new Help("quit", "playing chess"),
+            new Help("help", "with possible commands")
     );
 
-    static final List<HelpEntry> LOGGED_IN_HELP_ENTRIES = Arrays.asList(
-            new HelpEntry("create <NAME>", "initiate a new game session"),
-            new HelpEntry("list", "view a list of available games"),
-            new HelpEntry("join <ID> [WHITE|BLACK]", "participate in an existing game"),
-            new HelpEntry("observe <ID>", "watch an ongoing game"),
-            new HelpEntry("logout", "end the current session"),
-            new HelpEntry("quit", "exit the application"),
-            new HelpEntry("help", "display list of available commands")
+    static final List<Help> LOGGED_IN_HELP_ENTRIES = List.of(
+            new Help("create <NAME>", "a game"),
+            new Help("list", "games"),
+            new Help("join <ID> [WHITE|BLACK]", "a game"),
+            new Help("observe <ID>", "a game"),
+            new Help("logout", "when you are done"),
+            new Help("quit", "playing chess"),
+            new Help("help", "with possible commands")
     );
 
-    static final List<HelpEntry> OBSERVING_HELP_ENTRIES = Arrays.asList(
-            new HelpEntry("legal", "show legal moves for the current board position"),
-            new HelpEntry("redraw", "refresh the board display"),
-            new HelpEntry("leave", "stop observing the game"),
-            new HelpEntry("quit", "exit the application"),
-            new HelpEntry("help", "display list of available commands")
+    static final List<Help> OBSERVING_HELP_ENTRIES = List.of(
+            new Help("legal", "moves for the current board"),
+            new Help("redraw", "the board"),
+            new Help("leave", "the game"),
+            new Help("quit", "playing chess"),
+            new Help("help", "with possible commands")
     );
 
-    static final List<HelpEntry> PLAYING_HELP_ENTRIES = Arrays.asList(
-            new HelpEntry("redraw", "refresh the board display"),
-            new HelpEntry("leave", "forfeit and exit the game"),
-            new HelpEntry("move <crcr> [q|r|b|n]", "make a move and optionally promote a pawn"),
-            new HelpEntry("resign", "forfeit the game without exiting"),
-            new HelpEntry("legal <cr>", "show legal moves for a specific piece"),
-            new HelpEntry("quit", "exit the application"),
-            new HelpEntry("help", "display list of available commands")
+    static final List<Help> PLAYING_HELP_ENTRIES = List.of(
+            new Help("redraw", "the board"),
+            new Help("leave", "the game"),
+            new Help("move <crcr> [q|r|b|n]", "a piece with optional promotion"),
+            new Help("resign", "the game without leaving it"),
+            new Help("legal <cr>", "moves a given piece"),
+            new Help("quit", "playing chess"),
+            new Help("help", "with possible commands")
     );
 
-    private String getHelp(List<HelpEntry> help) {
+    private String getHelp(List<Help> help) {
         StringBuilder sb = new StringBuilder();
         for (var me : help) {
-            sb.append(String.format("  %s%s%s - %s%s%s%n", SET_TEXT_COLOR_BLUE, me.command, RESET_TEXT_COLOR, SET_TEXT_COLOR_MAGENTA, me.description, RESET_TEXT_COLOR));
+            sb.append(String.format("  %s%s%s - %s%s%s%n", SET_TEXT_COLOR_BLUE, me.cmd, RESET_TEXT_COLOR, SET_TEXT_COLOR_MAGENTA, me.description, RESET_TEXT_COLOR));
         }
         return sb.toString();
+
     }
 
     @Override
