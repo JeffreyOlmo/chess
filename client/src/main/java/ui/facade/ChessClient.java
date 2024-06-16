@@ -239,18 +239,28 @@ public class ChessClient implements DisplayHandler {
 
     public String move(String[] params) throws Exception {
         verifyAuth();
-        if (params.length == 1) {
-            var move = new ChessMove(params[0]);
-            if (isMoveLegal(move)) {
-                webSocket.sendCommand(new MoveCommand(authToken, gameData.getGameID(), move));
-                return "Success";
+        if (isPlaying() && isTurn()) {
+            if (params.length == 1) {
+                ChessMove move = new ChessMove(params[0]);
+                ChessPosition startPosition = move.getStartPosition();
+                ChessGame.TeamColor currentColor = (userState == State.BLACK) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+                ChessBoard board = gameData.getGame().getBoard();
+                ChessPiece piece = board.getPiece(startPosition);
+
+                if (piece != null && piece.getTeamColor() == currentColor) {
+                    Collection<ChessMove> validMoves = piece.pieceMoves(board, startPosition);
+                    if (validMoves.contains(move)) {
+                        webSocket.sendCommand(new MoveCommand(authToken, gameData.getGameID(), move));
+                        return "Success";
+                    }
+                }
             }
         }
         return "Failure";
     }
 
     public String leave(String[] ignored) throws Exception {
-        if (isPlaying() || isObserving()) {
+        if (isPlaying() || isObserving() || isGameOver()) {
             userState = State.LOGGED_IN;
             webSocket.sendCommand(new GameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameData.getGameID()));
             gameData = null;
@@ -308,7 +318,7 @@ public class ChessClient implements DisplayHandler {
     }
 
     public boolean isPlaying() {
-        return (gameData != null && (userState == State.WHITE || userState == State.BLACK) && !isGameOver());
+        return ((userState == State.WHITE || userState == State.BLACK) && !isGameOver());
     }
 
 
