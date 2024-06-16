@@ -171,12 +171,15 @@ public class ChessClient implements DisplayHandler {
 
     public String observe(String[] params) throws Exception {
         verifyAuth();
+        System.out.println(State.LOGGED_IN);
+        System.out.println(userState);
+
         if (State.LOGGED_IN == userState) {
             if (1 == params.length) {
                 int observedGameID = Integer.parseInt(params[0]);
                 gameData = server.joinGame(authToken, observedGameID, null);
                 userState = State.OBSERVING;
-                UserGameCommand.CommandType commandType = UserGameCommand.CommandType.JOIN_OBSERVER;
+                UserGameCommand.CommandType commandType = UserGameCommand.CommandType.CONNECT;
                 webSocket.sendCommand(new GameCommand(commandType, authToken, observedGameID));
                 return String.format("Joined %d as observer", gameData.getGameID());
             }

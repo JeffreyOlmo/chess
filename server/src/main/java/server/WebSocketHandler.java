@@ -142,7 +142,6 @@ public class WebSocketHandler {
                 System.out.println("command type: " + command.getCommandType());
                 switch (command.getCommandType()) {
                     case CONNECT -> join(connection, readJson(message, JoinPlayerCommand.class));
-                    case JOIN_OBSERVER -> observe(connection, command);
                     case MAKE_MOVE -> move(connection, readJson(message, MoveCommand.class));
                     case LEAVE -> leave(connection, command);
                     case RESIGN -> resign(connection, command);
@@ -166,17 +165,22 @@ public class WebSocketHandler {
             var expectedUsername = (command.playerColor == ChessGame.TeamColor.BLACK) ? gameData.getBlackUsername() : gameData.getWhiteUsername();
             System.out.println("Expected username: " + expectedUsername);
             System.out.println("Connection username: " + connection.user.getUsername());
-            if (true) {
-                connection.game = gameData;
-                System.out.println("Joined game ID: " + gameData.getGameID());
-                var loadMsg = (new LoadMessage(gameData)).toString();
-                connection.send(loadMsg);
 
-                var notificationMsg = (new NotificationMessage(String.format("%s joined %s as %s", connection.user.getUsername(), gameData.getGameName(), command.playerColor))).toString();
-                connections.broadcast(gameData.getGameID(), connection.user.getUsername(), notificationMsg);
-            } else {
-                connection.sendError("player has not joined game");
+            String whiteUsername = gameData.getWhiteUsername();
+            String blackUsername = gameData.getBlackUsername();
+            if (whiteUsername != null && blackUsername != null) {
+                // Both players have already joined, so the joining player should observe instead
+                observe(connection, command);
             }
+
+            connection.game = gameData;
+            System.out.println("Joined game ID: " + gameData.getGameID());
+            var loadMsg = (new LoadMessage(gameData)).toString();
+            connection.send(loadMsg);
+
+            var notificationMsg = (new NotificationMessage(String.format("%s joined %s as %s", connection.user.getUsername(), gameData.getGameName(), command.playerColor))).toString();
+            connections.broadcast(gameData.getGameID(), connection.user.getUsername(), notificationMsg);
+
         } else {
             connection.sendError("unknown game");
         }
