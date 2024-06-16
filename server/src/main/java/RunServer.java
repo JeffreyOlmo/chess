@@ -1,5 +1,4 @@
-package ui;
-
+import chess.*;
 import server.Server;
 
 public class RunServer {

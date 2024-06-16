@@ -1,8 +1,7 @@
 import ui.facade.ChessClient;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
-import server.Server;
-import ui.facade.State;
+
 
 import java.util.concurrent.CountDownLatch;
 public class MainProgram {
