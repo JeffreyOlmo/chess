@@ -13,6 +13,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import static ui.EscapeSequences.*;
 
 
@@ -145,17 +149,20 @@ public class ChessClient implements DisplayHandler {
 
     public String join(String[] params) throws Exception {
         verifyAuth();
+
         if (userState == State.LOGGED_IN) {
-            System.out.println("Logged in");
-
-            // Update the games list at the start of the join method
-            games = server.listGames(authToken);
-
             if (params.length == 2 && ("WHITE".equalsIgnoreCase(params[1]) || "BLACK".equalsIgnoreCase(params[1]))) {
                 int selectedGameIndex = Integer.parseInt(params[0]);
                 if (games != null && selectedGameIndex >= 0 && selectedGameIndex < games.length) {
                     int selectedGameID = games[selectedGameIndex].getGameID();
                     ChessGame.TeamColor selectedColor = ChessGame.TeamColor.valueOf(params[1].toUpperCase());
+
+                    // Check if the requested color is already taken
+                    if ((selectedColor == ChessGame.TeamColor.WHITE && games[selectedGameIndex].getWhiteUsername() != null) ||
+                            (selectedColor == ChessGame.TeamColor.BLACK && games[selectedGameIndex].getBlackUsername() != null)) {
+                        return "The requested color is already taken for this game.";
+                    }
+
                     gameData = server.joinGame(authToken, selectedGameID, selectedColor);
                     userState = (selectedColor == ChessGame.TeamColor.WHITE ? State.WHITE : State.BLACK);
                     webSocket.sendCommand(new JoinPlayerCommand(authToken, selectedGameID, selectedColor));
@@ -171,17 +178,24 @@ public class ChessClient implements DisplayHandler {
 
     public String observe(String[] params) throws Exception {
         verifyAuth();
-        System.out.println(State.LOGGED_IN);
-        System.out.println(userState);
 
         if (State.LOGGED_IN == userState) {
-            if (1 == params.length) {
-                int observedGameID = Integer.parseInt(params[0]);
-                gameData = server.joinGame(authToken, observedGameID, null);
-                userState = State.OBSERVING;
-                UserGameCommand.CommandType commandType = UserGameCommand.CommandType.CONNECT;
-                webSocket.sendCommand(new GameCommand(commandType, authToken, observedGameID));
-                return String.format("Joined %d as observer", gameData.getGameID());
+            if (params.length == 1) {
+                int observedGameIndex = Integer.parseInt(params[0]);
+                if (games != null && observedGameIndex >= 0 && observedGameIndex < games.length) {
+                    int observedGameID = games[observedGameIndex].getGameID();
+
+                    // Check if there are two players in the game
+                    if (games[observedGameIndex].getWhiteUsername() == null || games[observedGameIndex].getBlackUsername() == null) {
+                        return "Cannot observe a game without two players.";
+                    }
+
+                    gameData = server.joinGame(authToken, observedGameID, null);
+                    userState = State.OBSERVING;
+                    UserGameCommand.CommandType commandType = UserGameCommand.CommandType.CONNECT;
+                    webSocket.sendCommand(new GameCommand(commandType, authToken, observedGameID));
+                    return String.format("Joined %d as observer", gameData.getGameID());
+                }
             }
         }
 
@@ -195,6 +209,16 @@ public class ChessClient implements DisplayHandler {
             return "";
         }
         return "Failure";
+    }
+
+    public class Logger {
+        public static void logToFile(String message) {
+            try (PrintWriter out = new PrintWriter(new FileWriter("logfile.log", true))) {
+                out.println(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public String legal(String[] params) throws Exception {
@@ -252,7 +276,7 @@ public class ChessClient implements DisplayHandler {
 
     private void printGame(ChessGame.TeamColor color, Collection<ChessPosition> highlights) {
         System.out.println("\n");
-        System.out.print((gameData.getGame().getBoard()).toString());
+        System.out.print((gameData.getGame().getBoard()).toString(color, highlights));
         System.out.println();
     }
 

@@ -112,7 +112,12 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return toStringhelper(ChessGame.TeamColor.WHITE, null) + "\n" + toStringhelper(ChessGame.TeamColor.BLACK, null);
+        return toString(ChessGame.TeamColor.WHITE, null);
+    }
+
+
+    public String toString(ChessGame.TeamColor playerColor, Collection<ChessPosition> highlights) {
+        return toStringhelper(playerColor, highlights);
     }
 
     public String toStringhelper(ChessGame.TeamColor playerColor, Collection<ChessPosition> highlights) {
