@@ -87,6 +87,7 @@ public class ChessClient implements DisplayHandler {
     }
 
     public String quit(String[] ignored) {
+        System.exit(0);
         return "quit";
     }
 
@@ -149,7 +150,7 @@ public class ChessClient implements DisplayHandler {
 
     public String join(String[] params) throws Exception {
         verifyAuth();
-
+        games = server.listGames(authToken);
         if (userState == State.LOGGED_IN) {
             if (params.length == 2 && ("WHITE".equalsIgnoreCase(params[1]) || "BLACK".equalsIgnoreCase(params[1]))) {
                 int selectedGameIndex = Integer.parseInt(params[0]);
@@ -239,7 +240,7 @@ public class ChessClient implements DisplayHandler {
 
     public String move(String[] params) throws Exception {
         verifyAuth();
-        if (isPlaying() && isTurn()) {
+        if (isPlaying() && isTurn() && !isGameOver()) {
             if (params.length == 1) {
                 ChessMove move = new ChessMove(params[0]);
                 ChessPosition startPosition = move.getStartPosition();
