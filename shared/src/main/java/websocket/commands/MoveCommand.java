@@ -1,8 +1,8 @@
-package websocketmessages.usercommands;
+package websocket.commands;
 
 import chess.ChessMove;
 
-import static websocketmessages.usercommands.UserGameCommand.CommandType.MAKE_MOVE;
+import static websocket.commands.UserGameCommand.CommandType.MAKE_MOVE;
 
 public class MoveCommand extends GameCommand {
     public final ChessMove move;

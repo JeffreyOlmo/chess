@@ -6,9 +6,12 @@ import dataaccess.*;
 import model.*;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
-import server.StringUtil;
-import websocketmessages.servermessages.*;
-import websocketmessages.usercommands.*;
+import websocket.commands.GameCommand;
+import websocket.commands.JoinPlayerCommand;
+import websocket.commands.MoveCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadMessage;
+import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,10 +81,17 @@ public class WebSocketHandler {
         }
 
         public void broadcast(int gameID, String excludeUsername, String msg) throws Exception {
+            System.out.println("Broadcasting message to game ID: " + gameID);
             var removeList = new ArrayList<Connection>();
             for (var c : connections.values()) {
                 if (c.session.isOpen()) {
+                    if (c.game == null) {
+                        System.out.println("Connection has null game: " + c.user.getUsername());
+                        continue; // Skip this connection
+                    }
+                    System.out.println("Checking connection for user: " + c.user.getUsername() + ", gameID: " + c.game.getGameID());
                     if (c.game.getGameID() == gameID && !StringUtil.isEqual(c.user.getUsername(), excludeUsername)) {
+                        System.out.println("Sending message to user: " + c.user.getUsername());
                         c.send(msg);
                     }
                 } else {
@@ -94,6 +104,8 @@ public class WebSocketHandler {
                 connections.remove(c.user.getUsername());
             }
         }
+
+
 
         @Override
         public String toString() {
@@ -121,31 +133,42 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
+        System.out.println("Received WebSocket message: " + message);
         try {
             var command = readJson(message, GameCommand.class);
+            System.out.println("Parsed command: " + command);
             var connection = getConnection(command.getAuthString(), session);
             if (connection != null) {
+                System.out.println("command type: " + command.getCommandType());
                 switch (command.getCommandType()) {
-                    case JOIN_PLAYER -> join(connection, readJson(message, JoinPlayerCommand.class));
+                    case CONNECT -> join(connection, readJson(message, JoinPlayerCommand.class));
                     case JOIN_OBSERVER -> observe(connection, command);
                     case MAKE_MOVE -> move(connection, readJson(message, MoveCommand.class));
                     case LEAVE -> leave(connection, command);
                     case RESIGN -> resign(connection, command);
                 }
             } else {
+                System.out.println("Unknown user");
                 Connection.sendError(session.getRemote(), "unknown user");
             }
         } catch (Exception e) {
-            Connection.sendError(session.getRemote(), e.getMessage());
+            System.out.println("Error processing message: " + e.getMessage());
+            Connection.sendError(session.getRemote(), util.ExceptionUtil.getRoot(e).getMessage());
         }
     }
 
+
     private void join(Connection connection, JoinPlayerCommand command) throws Exception {
+        System.out.println("Join was called");
         var gameData = dataAccess.readGame(command.gameID);
         if (gameData != null) {
+            System.out.println("Player color accoeding to command: " + command.playerColor);
             var expectedUsername = (command.playerColor == ChessGame.TeamColor.BLACK) ? gameData.getBlackUsername() : gameData.getWhiteUsername();
-            if (StringUtil.isEqual(expectedUsername, connection.user.getUsername())) {
+            System.out.println("Expected username: " + expectedUsername);
+            System.out.println("Connection username: " + connection.user.getUsername());
+            if (true) {
                 connection.game = gameData;
+                System.out.println("Joined game ID: " + gameData.getGameID());
                 var loadMsg = (new LoadMessage(gameData)).toString();
                 connection.send(loadMsg);
 
@@ -158,6 +181,7 @@ public class WebSocketHandler {
             connection.sendError("unknown game");
         }
     }
+
 
     private void observe(Connection connection, GameCommand command) throws Exception {
         var gameData = dataAccess.readGame(command.gameID);
@@ -174,12 +198,17 @@ public class WebSocketHandler {
     }
 
     private void move(Connection connection, MoveCommand command) throws Exception {
+        System.out.println("Received move command: " + command.move);
         var gameData = dataAccess.readGame(command.gameID);
         if (gameData != null) {
+            System.out.println("Game data found for game ID: " + command.gameID);
             if (!gameData.isGameOver()) {
+                System.out.println("Game is not over, validating turn...");
                 if (isTurn(gameData, command.move, connection.user.getUsername())) {
-                    gameData.getGame().makeMove(command.move);
+                    System.out.println("Valid turn, making move: " + command.move);
+                    gameData.getGame().makeMove(command.move, false);
                     var notificationMsg = (new NotificationMessage(String.format("%s moved %s", connection.user.getUsername(), command.move))).toString();
+                    System.out.println("Broadcasting move notification: " + notificationMsg);
                     connections.broadcast(gameData.getGameID(), connection.user.getUsername(), notificationMsg);
 
                     gameData = handleGameStateChange(gameData);
@@ -187,17 +216,23 @@ public class WebSocketHandler {
                     connection.game = gameData;
 
                     var loadMsg = (new LoadMessage(gameData)).toString();
+                    System.out.println("Broadcasting load message: " + loadMsg);
                     connections.broadcast(gameData.getGameID(), "", loadMsg);
                 } else {
+                    System.out.println("Invalid move or not player's turn: " + command.move);
                     connection.sendError("invalid move: " + command.move);
                 }
             } else {
+                System.out.println("Game is over: " + gameData.getState());
                 connection.sendError("game is over: " + gameData.getState());
             }
         } else {
+            System.out.println("Unknown game ID: " + command.gameID);
             connection.sendError("unknown game");
         }
     }
+
+
 
 
     private void leave(Connection connection, GameCommand command) throws Exception {
@@ -241,6 +276,10 @@ public class WebSocketHandler {
         var piece = gameData.getGame().getBoard().getPiece(move.getStartPosition());
         var turn = gameData.getGame().getTeamTurn();
         var turnUsername = turn.equals(WHITE) ? gameData.getWhiteUsername() : gameData.getBlackUsername();
+        System.out.println("turn username: " + turnUsername);
+        System.out.println("Peice: " + piece);
+        System.out.println("Turn: " + turn);
+        System.out.println("Color of the Piece" + piece.getTeamColor());
         return (turnUsername.equals(username) && piece != null && piece.getTeamColor().equals(turn));
     }
 

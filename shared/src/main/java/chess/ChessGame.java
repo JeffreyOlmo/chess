@@ -204,11 +204,15 @@ public class ChessGame {
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
      */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
+    public void makeMove(ChessMove move, boolean isTest) throws InvalidMoveException {
         checkMove(move);
         printBoard(board);
         updateBoard(this.board, move);
-        this.teamTurn = this.teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        if (!isTest) {
+            System.out.println("turn before: " + this.teamTurn);
+            this.teamTurn = this.teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+            System.out.println("turn after: " + this.teamTurn);
+        }
     }
 
 
@@ -268,7 +272,8 @@ public class ChessGame {
                 if (currentPiece != null && currentPiece.getTeamColor() == teamColor){
                     for (ChessMove move : currentPiece.pieceMoves(board, currentPosition)) {
                         try {
-                            makeMove(move);
+                            System.out.println("\n Test move");
+                            makeMove(move, true);
                             return false;
                         } catch (InvalidMoveException e) {
 

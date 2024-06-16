@@ -1,6 +1,7 @@
-package websocketmessages.servermessages;
+package websocket.messages;
 
 import com.google.gson.Gson;
+import websocket.messages.ServerMessage;
 
 public class SerializableServerMessage extends ServerMessage {
 

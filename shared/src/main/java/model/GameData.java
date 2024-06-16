@@ -55,6 +55,7 @@ public class GameData {
     }
 
     public GameData setState(State state) {
+        System.out.println("State set");
         return new GameData(this.gameID, this.whiteUsername, this.blackUsername, this.gameName, this.game, state);
     }
 

@@ -46,7 +46,7 @@ public class Server {
     private void configureSpark(int desiredPort) {
         WebSocketHandler webSocketHandler = new WebSocketHandler(dataAccess);
         Spark.port(desiredPort);
-        Spark.webSocket("/connect", webSocketHandler);
+        Spark.webSocket("/ws", webSocketHandler);
 
         var webDir = Paths.get(Server.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "web");
         Spark.externalStaticFileLocation(webDir.toString());

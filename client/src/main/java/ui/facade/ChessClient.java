@@ -2,7 +2,10 @@ package ui.facade;
 
 import chess.*;
 import model.GameData;
-import websocketmessages.usercommands.*;
+import websocket.commands.GameCommand;
+import websocket.commands.JoinPlayerCommand;
+import websocket.commands.MoveCommand;
+import websocket.commands.*;
 import ui.websocket.WebSocketFacade;
 
 import java.util.ArrayList;

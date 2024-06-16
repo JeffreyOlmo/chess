@@ -1,4 +1,6 @@
-package websocketmessages.usercommands;
+package websocket.commands;
+
+import websocket.commands.UserGameCommand;
 
 public class GameCommand extends UserGameCommand {
     public final Integer gameID;

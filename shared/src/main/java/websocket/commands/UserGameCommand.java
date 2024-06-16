@@ -18,7 +18,9 @@ public class UserGameCommand {
         CONNECT,
         MAKE_MOVE,
         LEAVE,
-        RESIGN
+        RESIGN,
+        JOIN_PLAYER,
+        JOIN_OBSERVER
     }
 
     protected CommandType commandType;

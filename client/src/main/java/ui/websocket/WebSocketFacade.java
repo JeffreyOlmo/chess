@@ -2,11 +2,11 @@ package ui.websocket;
 
 import com.google.gson.Gson;
 import ui.facade.DisplayHandler;
-import websocketmessages.servermessages.ErrorMessage;
-import websocketmessages.servermessages.LoadMessage;
-import websocketmessages.servermessages.NotificationMessage;
-import websocketmessages.servermessages.ServerMessage;
-import websocketmessages.usercommands.GameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
+import websocket.commands.GameCommand;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class WebSocketFacade extends Endpoint {
 
 
     public WebSocketFacade(String serverName, DisplayHandler responseHandler) throws DeploymentException, IOException, URISyntaxException {
-        var url = String.format("ws://%s/connect", serverName);
+        var url = String.format("ws://%s/ws", serverName);
         URI socketURI = new URI(url);
         this.responseHandler = responseHandler;
 
