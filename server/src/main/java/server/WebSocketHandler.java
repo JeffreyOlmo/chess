@@ -203,7 +203,8 @@ public class WebSocketHandler {
                 if (isTurn(gameData, command.move, connection.user.getUsername())) {
                     System.out.println("Valid turn, making move: " + command.move);
                     gameData.getGame().makeMove(command.move, false);
-                    var notificationMsg = (new NotificationMessage(String.format("%s moved %s", connection.user.getUsername(), command.move))).toString();
+                    var movePos = gameData.getGame().getBoard().getPiece(command.move.getStartPosition());
+                    var notificationMsg = (new NotificationMessage(String.format("%s moved %s", connection.user.getUsername(), moveToString(command.move, movePos.getPieceType())))).toString();
                     System.out.println("Broadcasting move notification: " + notificationMsg);
                     connections.broadcast(gameData.getGameID(), connection.user.getUsername(), notificationMsg);
 
@@ -228,7 +229,31 @@ public class WebSocketHandler {
         }
     }
 
+    public String moveToString(ChessMove move, ChessPiece.PieceType pieceType) {
+        String startColumn = getColumnLetter(move.getStartPosition().getColumn());
+        String startRow = String.valueOf(move.getStartPosition().getRow());
+        String endColumn = getColumnLetter(move.getEndPosition().getColumn());
+        String endRow = String.valueOf(move.getEndPosition().getRow());
 
+        String pieceName = getPieceName(pieceType);
+
+        return String.format("%s from %s%s to %s%s", pieceName, startColumn, startRow, endColumn, endRow);
+    }
+
+    private String getColumnLetter(int column) {
+        return String.valueOf((char) ('a' + column - 1));
+    }
+
+    private String getPieceName(ChessPiece.PieceType pieceType) {
+        return switch (pieceType) {
+            case PAWN -> "Pawn";
+            case ROOK -> "Rook";
+            case KNIGHT -> "Knight";
+            case BISHOP -> "Bishop";
+            case QUEEN -> "Queen";
+            case KING -> "King";
+        };
+    }
 
 
     private void leave(Connection connection, GameCommand command) throws Exception {

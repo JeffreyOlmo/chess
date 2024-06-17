@@ -13,10 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-
 import static ui.EscapeSequences.*;
 
 
@@ -70,12 +66,6 @@ public class ChessClient implements DisplayHandler {
         server.clear();
     }
 
-//    public String clear(String[] ignored) throws Exception {
-//        clear();
-//        userState = State.LOGGED_OUT;
-//        gameData = null;
-//        return "Cleared the world";
-//    }
 
     private String help(String[] ignored) {
         return switch (userState) {
@@ -164,9 +154,7 @@ public class ChessClient implements DisplayHandler {
                         return "The requested color is already taken for this game.";
                     }
 
-                    System.out.println("Joining game with ID: " + selectedGameID + " as " + selectedColor);
                     gameData = server.joinGame(authToken, selectedGameID, selectedColor);
-                    System.out.println("After joining, gameData: " + gameData);
 
                     userState = (selectedColor == ChessGame.TeamColor.WHITE ? State.WHITE : State.BLACK);
                     webSocket.sendCommand(new JoinPlayerCommand(authToken, selectedGameID, selectedColor));
@@ -379,7 +367,6 @@ public class ChessClient implements DisplayHandler {
 
     @Override
     public void updateBoard(GameData newGameData) {
-        System.out.println("updateBoard called with newGameData: " + newGameData);
         gameData = newGameData;
         printGame();
         printPrompt();
