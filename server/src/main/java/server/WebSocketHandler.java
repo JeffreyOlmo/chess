@@ -203,8 +203,9 @@ public class WebSocketHandler {
                 if (isTurn(gameData, command.move, connection.user.getUsername())) {
                     System.out.println("Valid turn, making move: " + command.move);
                     gameData.getGame().makeMove(command.move, false);
-                    var movePos = gameData.getGame().getBoard().getPiece(command.move.getStartPosition());
-                    var notificationMsg = (new NotificationMessage(String.format("%s moved %s", connection.user.getUsername(), moveToString(command.move, movePos.getPieceType())))).toString();
+                    var notificationMsg = (new NotificationMessage(String.format("%s moved to %s%s",
+                            connection.user.getUsername(),getColumnLetter(command.move.getStartPosition().getColumn()),
+                            command.move.getEndPosition().getRow()))).toString();
                     System.out.println("Broadcasting move notification: " + notificationMsg);
                     connections.broadcast(gameData.getGameID(), connection.user.getUsername(), notificationMsg);
 

@@ -382,14 +382,12 @@ public class ChessClient implements DisplayHandler {
     public void message(String message) {
         System.out.println();
         System.out.println(SET_TEXT_COLOR_MAGENTA + "NOTIFY: " + message);
-        printPrompt();
     }
 
     @Override
     public void error(String message) {
         System.out.println();
         System.out.println(SET_TEXT_COLOR_RED + "NOTIFY: " + message);
-        printPrompt();
 
     }
 
