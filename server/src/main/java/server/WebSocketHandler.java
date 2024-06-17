@@ -214,6 +214,7 @@ public class WebSocketHandler {
                     connection.game = gameData;
 
                     var loadMsg = (new LoadMessage(gameData)).toString();
+                    System.out.println("Game Data: " + gameData.getGame().toJson());
                     System.out.println("Broadcasting load message: " + loadMsg);
                     connections.broadcast(gameData.getGameID(), "", loadMsg);
                 } else {
@@ -296,7 +297,7 @@ public class WebSocketHandler {
     private GameData handleGameStateChange(GameData gameData) throws Exception {
         NotificationMessage notificationMsg = null;
         var game = gameData.getGame();
-        if (game.isInStalemate(WHITE) || game.isInStalemate(BLACK)) {
+        if (game.isInStalemate(WHITE, false) || game.isInStalemate(BLACK, false)) {
             gameData = gameData.setState(GameData.State.DRAW);
             notificationMsg = new NotificationMessage("game is a draw");
         } else if (game.isInCheckmate(WHITE)) {

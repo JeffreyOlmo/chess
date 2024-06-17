@@ -223,7 +223,7 @@ public class ChessClient implements DisplayHandler {
 
     public String move(String[] params) throws Exception {
         verifyAuth();
-        if (isPlaying() && isTurn() && !isGameOver()) {
+        if (isPlaying() && isTurn()) {
             if (params.length == 1) {
                 ChessMove move = new ChessMove(params[0]);
                 ChessPosition startPosition = move.getStartPosition();
