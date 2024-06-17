@@ -12,11 +12,9 @@ import passoff.websocket.WebsocketTestingEnvironment;
 import server.Server;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
-
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class WebSocketTests {

@@ -9,9 +9,6 @@ public class Response {
         return games;
     }
 
-    public void setGames(GameData[] games) {
-        this.games = games;
-    }
 
     @Override
     public String toString() {

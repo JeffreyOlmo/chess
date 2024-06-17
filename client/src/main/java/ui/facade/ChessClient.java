@@ -288,19 +288,6 @@ public class ChessClient implements DisplayHandler {
         System.out.print(RESET_TEXT_COLOR + String.format("\n[%s: %s] >>> ", userState, gameState) + SET_TEXT_COLOR_GREEN);
     }
 
-    public boolean isMoveLegal(ChessMove move) {
-        if (isTurn()) {
-            var board = gameData.getGame().getBoard();
-            var piece = board.getPiece(move.getStartPosition());
-            if (piece != null) {
-                var validMoves = piece.pieceMoves(board, move.getStartPosition());
-                if (validMoves.contains(move)) {
-                    return gameData.getGame().validMoves(move.getStartPosition()).contains(move);
-                }
-            }
-        }
-        return false;
-    }
 
     public boolean isPlaying() {
         return ((userState == State.WHITE || userState == State.BLACK) && !isGameOver());
