@@ -22,6 +22,9 @@ public class ChessBoard {
     }
 
     public ChessPiece getPiece(ChessPosition position) {
+        if (position == null) {
+            return null;
+        }
         return board.get(position.toString());
     }
 
