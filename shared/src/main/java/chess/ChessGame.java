@@ -136,7 +136,7 @@ public class ChessGame {
     }
 
     public void updateBoard(ChessBoard hypotheticalBoard, ChessMove move) {
-        ChessPiece piece = board.getPiece(move.getStartPosition());
+        ChessPiece piece = hypotheticalBoard.getPiece(move.getStartPosition());
         if (move.getPromotionPiece() == null) {
             hypotheticalBoard.removePiece(move.getStartPosition());
 
