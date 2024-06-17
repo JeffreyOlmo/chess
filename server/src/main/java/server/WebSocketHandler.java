@@ -85,14 +85,12 @@ public class WebSocketHandler {
             var removeList = new ArrayList<Connection>();
             for (var c : connections.values()) {
                 if (c.session.isOpen()) {
-                    if (c.game == null) {
-                        System.out.println("Connection has null game: " + c.user.getUsername());
-                        continue; // Skip this connection
-                    }
-                    System.out.println("Checking connection for user: " + c.user.getUsername() + ", gameID: " + c.game.getGameID());
-                    if (c.game.getGameID() == gameID && !StringUtil.isEqual(c.user.getUsername(), excludeUsername)) {
-                        System.out.println("Sending message to user: " + c.user.getUsername());
-                        c.send(msg);
+                    if (c.game != null && c.game.getGameID() == gameID) {
+                        System.out.println("Checking connection for user: " + c.user.getUsername() + ", gameID: " + c.game.getGameID() + ", c.game: " + c.game);
+                        if (!StringUtil.isEqual(c.user.getUsername(), excludeUsername)) {
+                            System.out.println("Sending message to user: " + c.user.getUsername());
+                            c.send(msg);
+                        }
                     }
                 } else {
                     removeList.add(c);
@@ -141,7 +139,8 @@ public class WebSocketHandler {
             if (connection != null) {
                 System.out.println("command type: " + command.getCommandType());
                 switch (command.getCommandType()) {
-                    case CONNECT -> join(connection, readJson(message, JoinPlayerCommand.class));
+                    case JOIN_PLAYER, CONNECT -> join(connection, readJson(message, JoinPlayerCommand.class));
+                    case JOIN_OBSERVER -> observe(connection, readJson(message, JoinPlayerCommand.class));
                     case MAKE_MOVE -> move(connection, readJson(message, MoveCommand.class));
                     case LEAVE -> leave(connection, command);
                     case RESIGN -> resign(connection, command);
@@ -161,17 +160,10 @@ public class WebSocketHandler {
         System.out.println("Join was called");
         var gameData = dataAccess.readGame(command.gameID);
         if (gameData != null) {
-            System.out.println("Player color accoeding to command: " + command.playerColor);
+            System.out.println("Player color according to command: " + command.playerColor);
             var expectedUsername = (command.playerColor == ChessGame.TeamColor.BLACK) ? gameData.getBlackUsername() : gameData.getWhiteUsername();
             System.out.println("Expected username: " + expectedUsername);
             System.out.println("Connection username: " + connection.user.getUsername());
-
-            String whiteUsername = gameData.getWhiteUsername();
-            String blackUsername = gameData.getBlackUsername();
-            if (whiteUsername != null && blackUsername != null) {
-                // Both players have already joined, so the joining player should observe instead
-                observe(connection, command);
-            }
 
             connection.game = gameData;
             System.out.println("Joined game ID: " + gameData.getGameID());

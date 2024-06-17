@@ -164,7 +164,10 @@ public class ChessClient implements DisplayHandler {
                         return "The requested color is already taken for this game.";
                     }
 
+                    System.out.println("Joining game with ID: " + selectedGameID + " as " + selectedColor);
                     gameData = server.joinGame(authToken, selectedGameID, selectedColor);
+                    System.out.println("After joining, gameData: " + gameData);
+
                     userState = (selectedColor == ChessGame.TeamColor.WHITE ? State.WHITE : State.BLACK);
                     webSocket.sendCommand(new JoinPlayerCommand(authToken, selectedGameID, selectedColor));
                     return String.format("Joined %d as %s", gameData.getGameID(), selectedColor);
@@ -193,7 +196,7 @@ public class ChessClient implements DisplayHandler {
 
                     gameData = server.joinGame(authToken, observedGameID, null);
                     userState = State.OBSERVING;
-                    UserGameCommand.CommandType commandType = UserGameCommand.CommandType.CONNECT;
+                    UserGameCommand.CommandType commandType = UserGameCommand.CommandType.JOIN_OBSERVER;
                     webSocket.sendCommand(new GameCommand(commandType, authToken, observedGameID));
                     return String.format("Joined %d as observer", gameData.getGameID());
                 }
@@ -212,15 +215,7 @@ public class ChessClient implements DisplayHandler {
         return "Failure";
     }
 
-    public class Logger {
-        public static void logToFile(String message) {
-            try (PrintWriter out = new PrintWriter(new FileWriter("logfile.log", true))) {
-                out.println(message);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 
     public String legal(String[] params) throws Exception {
         verifyAuth();
@@ -279,6 +274,7 @@ public class ChessClient implements DisplayHandler {
         }
         return "Failure";
     }
+
 
     private void printGame() {
         var color = userState == State.BLACK ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
@@ -383,6 +379,7 @@ public class ChessClient implements DisplayHandler {
 
     @Override
     public void updateBoard(GameData newGameData) {
+        System.out.println("updateBoard called with newGameData: " + newGameData);
         gameData = newGameData;
         printGame();
         printPrompt();
