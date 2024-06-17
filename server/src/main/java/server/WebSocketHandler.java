@@ -202,7 +202,7 @@ public class WebSocketHandler {
                 System.out.println("Game is not over, validating turn...");
                 if (isTurn(gameData, command.move, connection.user.getUsername())) {
                     System.out.println("Valid turn, making move: " + command.move);
-                    gameData.getGame().makeMove(command.move, false);
+                    gameData.getGame().makeMove(command.move);
                     var notificationMsg = (new NotificationMessage(String.format("%s moved to %s%s",
                             connection.user.getUsername(),getColumnLetter(command.move.getStartPosition().getColumn()),
                             command.move.getEndPosition().getRow()))).toString();
